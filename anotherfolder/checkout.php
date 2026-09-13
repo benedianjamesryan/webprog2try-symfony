@@ -51,6 +51,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $postalCode = trim($_POST["postal_code"] ?? "");
     $paymentMethod = $_POST["payment_method"] ?? "";
 
+    $gcashNumber = preg_replace("/\D/", "", $_POST["gcash_number"] ?? "");
+    $cardNumber = preg_replace("/\D/", "", $_POST["card_number"] ?? "");
+    $cardName = trim($_POST["card_name"] ?? "");
+    $cardCvv = preg_replace("/\D/", "", $_POST["card_cvv"] ?? "");
+    $cardExpiry = trim($_POST["card_expiry"] ?? "");
+
     if ($firstName === "") {
         $errors[] = "First name is required.";
     }
@@ -90,6 +96,30 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if (!in_array($paymentMethod, $allowedPaymentMethods, true)) {
         $errors[] = "Please select a valid payment method.";
+    }
+
+    if ($paymentMethod === "GCash") {
+        if (!preg_match("/^09\d{9}$/", $gcashNumber)) {
+            $errors[] = "Please enter a valid 11-digit GCash number.";
+        }
+    }
+
+    if ($paymentMethod === "Card") {
+        if (!preg_match("/^\d{16}$/", $cardNumber)) {
+            $errors[] = "Card number must contain 16 digits.";
+        }
+
+        if ($cardName === "") {
+            $errors[] = "Cardholder name is required.";
+        }
+
+        if (!preg_match("/^\d{3,4}$/", $cardCvv)) {
+            $errors[] = "Please enter a valid CVV.";
+        }
+
+        if (!preg_match("/^(0[1-9]|1[0-2])\/\d{2}$/", $cardExpiry)) {
+            $errors[] = "Please enter a valid expiry date.";
+        }
     }
 
     $cartStmt = $pdo->prepare("
@@ -382,12 +412,13 @@ unset($item);
     <nav class="products-nav">
         <a href="index.php">HOME</a>
         <a href="products.php">PRODUCTS</a>
+        <a href="my-orders.php">MY ORDERS</a>
         <a href="about.php">ABOUT US</a>
         <a href="contact.php">CONTACT</a>
     </nav>
 
     <div class="header-actions">
-        <a href="#" class="header-icon logout-button" title="Logout">♙</a>
+        <a href="#" class="header-icon logout-button" title="Logout">LOGOUT</a>
 
         <a href="cart.php" class="cart-link">
             🛒
@@ -397,6 +428,7 @@ unset($item);
 </header>
 
 <main class="checkout-page">
+
     <div class="checkout-title">
         <h1>CHECKOUT</h1>
         <p>Review your order and enter your delivery information.</p>
@@ -413,16 +445,26 @@ unset($item);
     <?php if (!$orderPlaced && !empty($cartItems)): ?>
 
         <form method="POST" action="checkout.php" id="checkoutForm">
-            <input type="hidden" name="csrf_token" value="<?= e($_SESSION["csrf_token"]) ?>">
+
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="<?= e($_SESSION["csrf_token"]) ?>"
+            >
 
             <div class="checkout-layout">
+
                 <section>
+
                     <div class="checkout-section">
+
                         <h2>CUSTOMER INFORMATION</h2>
 
                         <div class="checkout-form-grid">
+
                             <div class="checkout-field">
                                 <label for="first_name">FIRST NAME</label>
+
                                 <input
                                     type="text"
                                     id="first_name"
@@ -436,6 +478,7 @@ unset($item);
 
                             <div class="checkout-field">
                                 <label for="last_name">LAST NAME</label>
+
                                 <input
                                     type="text"
                                     id="last_name"
@@ -449,6 +492,7 @@ unset($item);
 
                             <div class="checkout-field">
                                 <label for="email">EMAIL</label>
+
                                 <input
                                     type="email"
                                     id="email"
@@ -462,6 +506,7 @@ unset($item);
 
                             <div class="checkout-field">
                                 <label for="phone">PHONE</label>
+
                                 <input
                                     type="tel"
                                     id="phone"
@@ -475,6 +520,7 @@ unset($item);
 
                             <div class="checkout-field full">
                                 <label for="address">COMPLETE ADDRESS</label>
+
                                 <textarea
                                     id="address"
                                     name="address"
@@ -486,6 +532,7 @@ unset($item);
 
                             <div class="checkout-field">
                                 <label for="city">CITY / MUNICIPALITY</label>
+
                                 <input
                                     type="text"
                                     id="city"
@@ -499,6 +546,7 @@ unset($item);
 
                             <div class="checkout-field">
                                 <label for="province">PROVINCE</label>
+
                                 <input
                                     type="text"
                                     id="province"
@@ -512,6 +560,7 @@ unset($item);
 
                             <div class="checkout-field">
                                 <label for="postal_code">POSTAL CODE</label>
+
                                 <input
                                     type="text"
                                     id="postal_code"
@@ -522,13 +571,17 @@ unset($item);
                                     required
                                 >
                             </div>
+
                         </div>
+
                     </div>
 
                     <div class="checkout-section">
+
                         <h2>PAYMENT METHOD</h2>
 
                         <div class="payment-options">
+
                             <label class="payment-option">
                                 <input
                                     type="radio"
@@ -537,6 +590,7 @@ unset($item);
                                     <?= ($_POST["payment_method"] ?? "COD") === "COD" ? "checked" : "" ?>
                                     required
                                 >
+
                                 <span>Cash on Delivery</span>
                             </label>
 
@@ -547,6 +601,7 @@ unset($item);
                                     value="GCash"
                                     <?= ($_POST["payment_method"] ?? "") === "GCash" ? "checked" : "" ?>
                                 >
+
                                 <span>GCash</span>
                             </label>
 
@@ -557,15 +612,119 @@ unset($item);
                                     value="Card"
                                     <?= ($_POST["payment_method"] ?? "") === "Card" ? "checked" : "" ?>
                                 >
+
                                 <span>Card</span>
                             </label>
+
                         </div>
+
+                        <div
+                            class="payment-details"
+                            id="gcashDetails"
+                            <?= ($_POST["payment_method"] ?? "") === "GCash" ? "" : 'style="display:none;"' ?>
+                        >
+
+                            <div class="checkout-field">
+                                <label for="gcash_number">GCASH NUMBER</label>
+
+                                <input
+                                    type="tel"
+                                    id="gcash_number"
+                                    name="gcash_number"
+                                    value="<?= e($_POST["gcash_number"] ?? "") ?>"
+                                    placeholder="09XXXXXXXXX"
+                                    maxlength="11"
+                                    inputmode="numeric"
+                                    autocomplete="tel"
+                                >
+
+                                <small>Enter your 11-digit GCash mobile number.</small>
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="payment-details"
+                            id="cardDetails"
+                            <?= ($_POST["payment_method"] ?? "") === "Card" ? "" : 'style="display:none;"' ?>
+                        >
+
+                            <div class="checkout-form-grid">
+
+                                <div class="checkout-field full">
+                                    <label for="card_number">CARD NUMBER</label>
+
+                                    <input
+                                        type="text"
+                                        id="card_number"
+                                        name="card_number"
+                                        value="<?= e($_POST["card_number"] ?? "") ?>"
+                                        placeholder="1234 5678 9012 3456"
+                                        maxlength="19"
+                                        inputmode="numeric"
+                                        autocomplete="cc-number"
+                                    >
+                                </div>
+
+                                <div class="checkout-field">
+                                    <label for="card_name">CARDHOLDER NAME</label>
+
+                                    <input
+                                        type="text"
+                                        id="card_name"
+                                        name="card_name"
+                                        value="<?= e($_POST["card_name"] ?? "") ?>"
+                                        placeholder="Name on card"
+                                        maxlength="100"
+                                        autocomplete="cc-name"
+                                    >
+                                </div>
+
+                                <div class="checkout-field">
+                                    <label for="card_expiry">EXPIRY DATE</label>
+
+                                    <input
+                                        type="text"
+                                        id="card_expiry"
+                                        name="card_expiry"
+                                        value="<?= e($_POST["card_expiry"] ?? "") ?>"
+                                        placeholder="MM/YY"
+                                        maxlength="5"
+                                        inputmode="numeric"
+                                        autocomplete="cc-exp"
+                                    >
+                                </div>
+
+                                <div class="checkout-field">
+                                    <label for="card_cvv">CVV</label>
+
+                                    <input
+                                        type="password"
+                                        id="card_cvv"
+                                        name="card_cvv"
+                                        placeholder="123"
+                                        maxlength="4"
+                                        inputmode="numeric"
+                                        autocomplete="cc-csc"
+                                    >
+                                </div>
+
+                            </div>
+
+                            <small class="card-note">
+                                Card information is used for checkout validation only and is not stored.
+                            </small>
+
+                        </div>
+
                     </div>
 
                     <div class="checkout-section">
+
                         <h2>YOUR ORDER</h2>
 
                         <?php foreach ($cartItems as $item): ?>
+
                             <?php
                             $itemTotal =
                                 (float)$item["price"] *
@@ -573,6 +732,7 @@ unset($item);
                             ?>
 
                             <div class="checkout-item">
+
                                 <div class="checkout-item-image">
                                     <img
                                         src="<?= e($item["display_image"]) ?>"
@@ -581,23 +741,31 @@ unset($item);
                                 </div>
 
                                 <div class="checkout-item-info">
+
                                     <h3><?= e($item["name"]) ?></h3>
+
                                     <p>
                                         <?= (int)$item["quantity"] ?>
                                         ×
                                         <?= money($item["price"]) ?>
                                     </p>
+
                                 </div>
 
                                 <div class="checkout-item-price">
                                     <?= money($itemTotal) ?>
                                 </div>
+
                             </div>
+
                         <?php endforeach; ?>
+
                     </div>
+
                 </section>
 
                 <aside class="checkout-summary">
+
                     <h2>ORDER SUMMARY</h2>
 
                     <div class="summary-row">
@@ -620,37 +788,55 @@ unset($item);
                         <strong><?= money($total) ?></strong>
                     </div>
 
-                    <button type="submit" class="place-order-button">
+                    <button
+                        type="submit"
+                        class="place-order-button"
+                    >
                         PLACE ORDER
                     </button>
 
-                    <a href="cart.php" class="back-cart">
+                    <a
+                        href="cart.php"
+                        class="back-cart"
+                    >
                         ← BACK TO CART
                     </a>
+
                 </aside>
+
             </div>
+
         </form>
 
     <?php elseif (!$orderPlaced): ?>
 
         <div class="checkout-section empty-checkout">
+
             <h2>YOUR CART IS EMPTY</h2>
 
             <p class="empty-checkout-message">
                 Add products to your cart before checking out.
             </p>
 
-            <a href="products.php" class="checkout-button">
+            <a
+                href="products.php"
+                class="checkout-button"
+            >
                 CONTINUE SHOPPING
             </a>
+
         </div>
 
     <?php endif; ?>
+
 </main>
 
 <?php if ($orderPlaced): ?>
+
     <div class="order-success-overlay">
+
         <div class="order-success-modal">
+
             <div class="order-success-icon">✓</div>
 
             <h2>ORDER CONFIRMED</h2>
@@ -666,14 +852,86 @@ unset($item);
                 <?= money($orderTotal) ?>
             </p>
 
-            <a href="products.php" class="order-success-button">
+            <a
+                href="my-orders.php"
+                class="order-success-button"
+            >
+                VIEW ORDER
+            </a>
+
+            <a
+                href="products.php"
+                class="order-success-button secondary"
+            >
                 CONTINUE SHOPPING
             </a>
+
         </div>
+
     </div>
+
 <?php endif; ?>
 
 <?php require_once "includes/logout-popup.php"; ?>
+
+<script>
+const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
+const gcashDetails = document.getElementById('gcashDetails');
+const cardDetails = document.getElementById('cardDetails');
+
+const gcashNumber = document.getElementById('gcash_number');
+const cardNumber = document.getElementById('card_number');
+const cardName = document.getElementById('card_name');
+const cardCvv = document.getElementById('card_cvv');
+const cardExpiry = document.getElementById('card_expiry');
+
+function updatePaymentDetails() {
+    const selected = document.querySelector('input[name="payment_method"]:checked')?.value;
+
+    gcashDetails.style.display = selected === 'GCash' ? 'block' : 'none';
+    cardDetails.style.display = selected === 'Card' ? 'block' : 'none';
+
+    gcashNumber.required = selected === 'GCash';
+
+    cardNumber.required = selected === 'Card';
+    cardName.required = selected === 'Card';
+    cardCvv.required = selected === 'Card';
+    cardExpiry.required = selected === 'Card';
+}
+
+paymentMethods.forEach(input => {
+    input.addEventListener('change', updatePaymentDetails);
+});
+
+gcashNumber.addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g, '').slice(0, 11);
+});
+
+cardNumber.addEventListener('input', function () {
+    let value = this.value.replace(/\D/g, '').slice(0, 16);
+    this.value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+});
+
+cardName.addEventListener('input', function () {
+    this.value = this.value.slice(0, 100);
+});
+
+cardCvv.addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g, '').slice(0, 4);
+});
+
+cardExpiry.addEventListener('input', function () {
+    let value = this.value.replace(/\D/g, '').slice(0, 4);
+
+    if (value.length >= 3) {
+        value = value.slice(0, 2) + '/' + value.slice(2);
+    }
+
+    this.value = value;
+});
+
+updatePaymentDetails();
+</script>
 
 <script src="js/script.js"></script>
 
