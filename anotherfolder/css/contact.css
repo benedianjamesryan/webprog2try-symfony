@@ -105,7 +105,7 @@ a {
 
 .header-icon,
 .login-link,
-.logout-button {
+.logout-button { 
     color: var(--muted);
     font-size: 9px;
     font-weight: 800;
@@ -117,7 +117,7 @@ a {
 .header-icon:hover,
 .login-link:hover,
 .logout-button:hover {
-    color: var(--blue);
+    color: var(--blue);   
 }
 
 .header-actions .admin-link {

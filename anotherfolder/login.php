@@ -4,6 +4,26 @@ session_start();
 
 require_once "database/config.php";
 
+// If already logged in, skip the login page and go straight home
+if (!empty($_SESSION["user_id"])) {
+    $redirect =
+        $_GET["redirect"] ??
+        $_POST["redirect"] ??
+        "index.php";
+
+    if (
+        $redirect === "" ||
+        str_contains($redirect, "://") ||
+        str_starts_with($redirect, "//") ||
+        str_starts_with($redirect, "../")
+    ) {
+        $redirect = "index.php";
+    }
+
+    header("Location: " . $redirect);
+    exit;
+}
+
 $error = "";
 $email = "";
 
@@ -22,6 +42,11 @@ if (
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    // Detect if this came from the floating login modal (fetch/AJAX)
+    $isAjax =
+        (($_SERVER["HTTP_X_REQUESTED_WITH"] ?? "") === "XMLHttpRequest") ||
+        str_contains($_SERVER["HTTP_ACCEPT"] ?? "", "application/json");
+
     $email = trim($_POST["email"] ?? "");
     $password = $_POST["password"] ?? "";
 
@@ -83,12 +108,31 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION["role"] =
                 (string)$user["role"];
 
+            if ($isAjax) {
+                header("Content-Type: application/json");
+                echo json_encode([
+                    "success" => true,
+                    "redirect" => $redirect,
+                ]);
+                exit;
+            }
+
             header(
                 "Location: " . $redirect
             );
 
             exit;
         }
+    }
+
+    // If we got here, $error is set — respond accordingly
+    if ($isAjax) {
+        header("Content-Type: application/json");
+        echo json_encode([
+            "success" => false,
+            "error" => $error,
+        ]);
+        exit;
     }
 }
 

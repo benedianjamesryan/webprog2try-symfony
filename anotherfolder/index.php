@@ -363,6 +363,8 @@ $year = date("Y");
             Sign in to your FROSTCORE experience.
         </p>
 
+        <div class="form-error" id="loginFormError" hidden></div>
+
         <form id="loginForm" action="login.php" method="post">
             <label for="email">EMAIL</label>
 
@@ -405,7 +407,10 @@ $year = date("Y");
 
         <p class="create">
             Don't have an account?
-            <a href="login.php">CREATE ACCOUNT</a>
+         <a 
+            href="register.php">CREATE ACCOUNT
+
+        </a>
         </p>
     </div>
 </div>
@@ -413,6 +418,57 @@ $year = date("Y");
 <?php require_once "includes/logout-popup.php"; ?>
 
 <script src="js/script.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var loginForm = document.getElementById("loginForm");
+    var loginError = document.getElementById("loginFormError");
+
+    if (!loginForm || !loginError) return;
+
+    loginForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        loginError.hidden = true;
+        loginError.textContent = "";
+
+        var submitBtn = loginForm.querySelector(".login-submit");
+        if (submitBtn) submitBtn.disabled = true;
+
+        var formData = new FormData(loginForm);
+
+        fetch("login.php", {
+            method: "POST",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            },
+            body: formData
+        })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                if (data.success) {
+                    window.location.href = data.redirect;
+                    return;
+                }
+
+                loginError.textContent =
+                    data.error || "Something went wrong. Please try again.";
+                loginError.hidden = false;
+
+                if (submitBtn) submitBtn.disabled = false;
+            })
+            .catch(function () {
+                loginError.textContent =
+                    "Something went wrong. Please try again.";
+                loginError.hidden = false;
+
+                if (submitBtn) submitBtn.disabled = false;
+            });
+    });
+});
+</script>
 
 </body>
 </html>
