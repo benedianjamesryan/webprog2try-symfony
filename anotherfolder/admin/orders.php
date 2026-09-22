@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 
 require_once "../database/config.php";
@@ -7,7 +8,7 @@ if (
     empty($_SESSION["user_id"]) ||
     ($_SESSION["role"] ?? "") !== "admin"
 ) {
-    header("Location: admin-login.php");
+    header("Location: ../login.php");
     exit;
 }
 
@@ -45,6 +46,7 @@ $successMessage = "";
 $errorMessage = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
     $token = $_POST["csrf_token"] ?? "";
     $action = $_POST["action"] ?? "";
 
@@ -66,14 +68,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $token
         )
     ) {
+
         $errorMessage = "Invalid request. Please refresh the page.";
+
     } elseif ($action !== "update_status") {
+
         $errorMessage = "Invalid action.";
+
     } elseif (!$orderId || $orderId <= 0) {
+
         $errorMessage = "Invalid order.";
-    } elseif (!in_array($newStatus, $allowedStatuses, true)) {
+
+    } elseif (!in_array(
+        $newStatus,
+        $allowedStatuses,
+        true
+    )) {
+
         $errorMessage = "Invalid order status.";
+
     } else {
+
         $updateStmt = $pdo->prepare("
             UPDATE orders
             SET status = ?
@@ -128,6 +143,7 @@ $orderColumns = "
 ";
 
 if ($selectedStatus !== "") {
+
     $ordersStmt = $pdo->prepare("
         SELECT $orderColumns
         FROM orders
@@ -138,7 +154,9 @@ if ($selectedStatus !== "") {
     $ordersStmt->execute([
         $selectedStatus
     ]);
+
 } else {
+
     $ordersStmt = $pdo->query("
         SELECT $orderColumns
         FROM orders
@@ -160,6 +178,7 @@ $viewId = filter_input(
 );
 
 if ($viewId && $viewId > 0) {
+
     $orderStmt = $pdo->prepare("
         SELECT $orderColumns
         FROM orders
@@ -176,6 +195,7 @@ if ($viewId && $viewId > 0) {
     );
 
     if ($selectedOrder) {
+
         $itemsStmt = $pdo->prepare("
             SELECT
                 id,
@@ -200,32 +220,52 @@ if ($viewId && $viewId > 0) {
 }
 
 $adminName = $_SESSION["username"] ?? "Administrator";
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
+
     <title>FROSTCORE - Admin Orders</title>
-    <link rel="stylesheet" href="../css/admin/orders.css">
+
+    <link
+        rel="stylesheet"
+        href="../css/admin/orders.css"
+    >
+
 </head>
 
 <body>
 
 <header class="admin-header">
-    <a href="dashboard.php" class="admin-brand">
+
+    <a
+        href="dashboard.php"
+        class="admin-brand"
+    >
+
         <img
             src="../assets/logo/frostcore_logo.png"
             alt="FROSTCORE Logo"
         >
-        <span>FROSTCORE ADMIN</span>
+
+        <span>
+            FROSTCORE ADMIN
+        </span>
+
     </a>
 
     <div class="admin-header-right">
+
         <span class="admin-name">
             Welcome, <?= e($adminName) ?>
         </span>
@@ -237,46 +277,88 @@ $adminName = $_SESSION["username"] ?? "Administrator";
         >
             LOGOUT
         </a>
+
     </div>
+
 </header>
 
 <div class="admin-layout">
 
     <aside class="admin-sidebar">
-        <div class="sidebar-title">MANAGEMENT</div>
 
-        <a href="dashboard.php">DASHBOARD</a>
-        <a href="orders.php" class="active">ORDERS</a>
-        <a href="customers.php">CUSTOMERS</a>
-        <a href="products.php">PRODUCTS</a>
-        <a href="reviews.php">REVIEWS</a>
+        <div class="sidebar-title">
+            MANAGEMENT
+        </div>
 
-        <div class="sidebar-title">WEBSITE</div>
+        <a href="dashboard.php">
+            DASHBOARD
+        </a>
 
-        <a href="../products.php">VIEW STORE</a>
-        <a href="../index.php">HOMEPAGE</a>
+        <a
+            href="orders.php"
+            class="active"
+        >
+            ORDERS
+        </a>
+
+        <a href="customers.php">
+            CUSTOMERS
+        </a>
+
+        <a href="products.php">
+            PRODUCTS
+        </a>
+
+        <a href="reviews.php">
+            REVIEWS
+        </a>
+
+        <div class="sidebar-title">
+            WEBSITE
+        </div>
+
+        <a href="../products.php">
+            VIEW STORE
+        </a>
+
+        <a href="../index.php">
+            HOMEPAGE
+        </a>
+
     </aside>
 
     <main class="admin-main">
 
         <div class="page-title">
-            <h1>ORDERS</h1>
-            <p>View customer orders and manage order status.</p>
+
+            <h1>
+                ORDERS
+            </h1>
+
+            <p>
+                View customer orders and manage order status.
+            </p>
+
         </div>
 
         <?php if ($successMessage !== ""): ?>
+
             <div class="message success">
                 <?= e($successMessage) ?>
             </div>
+
         <?php endif; ?>
 
         <?php if ($errorMessage !== ""): ?>
+
             <div class="message error">
                 <?= e($errorMessage) ?>
             </div>
+
         <?php endif; ?>
 
         <div class="filter-bar">
+
             <a
                 href="orders.php"
                 class="<?= $selectedStatus === "" ? "active" : "" ?>"
@@ -311,6 +393,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
             >
                 COMPLETED
             </a>
+
         </div>
 
         <section class="orders-card">
@@ -318,9 +401,11 @@ $adminName = $_SESSION["username"] ?? "Administrator";
             <?php if (!empty($orders)): ?>
 
                 <div class="table-wrap">
+
                     <table class="orders-table">
 
                         <thead>
+
                             <tr>
                                 <th>ORDER</th>
                                 <th>CUSTOMER</th>
@@ -330,6 +415,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
                                 <th>DATE</th>
                                 <th>ACTION</th>
                             </tr>
+
                         </thead>
 
                         <tbody>
@@ -337,6 +423,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
                             <?php foreach ($orders as $order): ?>
 
                                 <?php
+
                                 $status = (string)$order["status"];
 
                                 $statusClass = match ($status) {
@@ -346,22 +433,29 @@ $adminName = $_SESSION["username"] ?? "Administrator";
                                     "Completed" => "status-completed",
                                     default => "status-default"
                                 };
+
                                 ?>
 
                                 <tr>
 
                                     <td>
+
                                         <span class="order-number">
                                             <?= e($order["order_number"]) ?>
                                         </span>
+
                                     </td>
 
                                     <td>
+
                                         <?= e($order["full_name"]) ?>
+
                                         <br>
+
                                         <small class="sub-info">
                                             <?= e($order["email"]) ?>
                                         </small>
+
                                     </td>
 
                                     <td>
@@ -369,36 +463,49 @@ $adminName = $_SESSION["username"] ?? "Administrator";
                                     </td>
 
                                     <td>
+
                                         <span class="order-total">
                                             <?= money($order["total"]) ?>
                                         </span>
+
                                     </td>
 
                                     <td>
-                                        <span class="status <?= e($statusClass) ?>">
+
+                                        <span
+                                            class="status <?= e($statusClass) ?>"
+                                        >
                                             <?= e($status) ?>
                                         </span>
+
                                     </td>
 
                                     <td>
+
                                         <?= e(
                                             date(
                                                 "M d, Y",
                                                 strtotime($order["created_at"])
                                             )
                                         ) ?>
+
                                         <br>
+
                                         <small class="sub-info">
+
                                             <?= e(
                                                 date(
                                                     "h:i A",
                                                     strtotime($order["created_at"])
                                                 )
                                             ) ?>
+
                                         </small>
+
                                     </td>
 
                                     <td>
+
                                         <div class="action-area">
 
                                             <a
@@ -412,6 +519,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
                                                 method="POST"
                                                 class="status-form"
                                             >
+
                                                 <input
                                                     type="hidden"
                                                     name="csrf_token"
@@ -431,22 +539,28 @@ $adminName = $_SESSION["username"] ?? "Administrator";
                                                 >
 
                                                 <select name="status">
+
                                                     <?php foreach ($allowedStatuses as $option): ?>
+
                                                         <option
                                                             value="<?= e($option) ?>"
                                                             <?= $status === $option ? "selected" : "" ?>
                                                         >
                                                             <?= e($option) ?>
                                                         </option>
+
                                                     <?php endforeach; ?>
+
                                                 </select>
 
                                                 <button type="submit">
                                                     SAVE
                                                 </button>
+
                                             </form>
 
                                         </div>
+
                                     </td>
 
                                 </tr>
@@ -456,6 +570,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
                         </tbody>
 
                     </table>
+
                 </div>
 
             <?php else: ?>
@@ -471,6 +586,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
         <?php if ($selectedOrder): ?>
 
             <?php
+
             $selectedOrderStatus = (string)$selectedOrder["status"];
 
             $selectedStatusClass = match ($selectedOrderStatus) {
@@ -480,6 +596,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
                 "Completed" => "status-completed",
                 default => "status-default"
             };
+
             ?>
 
             <section
@@ -490,6 +607,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
                 <div class="details-header">
 
                     <div>
+
                         <h2>
                             ORDER <?= e($selectedOrder["order_number"]) ?>
                         </h2>
@@ -503,9 +621,12 @@ $adminName = $_SESSION["username"] ?? "Administrator";
                                 )
                             ) ?>
                         </p>
+
                     </div>
 
-                    <span class="status <?= e($selectedStatusClass) ?>">
+                    <span
+                        class="status <?= e($selectedStatusClass) ?>"
+                    >
                         <?= e($selectedOrderStatus) ?>
                     </span>
 
@@ -515,6 +636,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
 
                     <div class="detail-box">
                         <span>CUSTOMER</span>
+
                         <strong>
                             <?= e($selectedOrder["full_name"]) ?>
                         </strong>
@@ -522,6 +644,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
 
                     <div class="detail-box">
                         <span>EMAIL</span>
+
                         <strong>
                             <?= e($selectedOrder["email"]) ?>
                         </strong>
@@ -529,6 +652,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
 
                     <div class="detail-box">
                         <span>PHONE</span>
+
                         <strong>
                             <?= e($selectedOrder["phone"]) ?>
                         </strong>
@@ -536,6 +660,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
 
                     <div class="detail-box">
                         <span>PAYMENT</span>
+
                         <strong>
                             <?= e($selectedOrder["payment_method"]) ?>
                         </strong>
@@ -543,6 +668,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
 
                     <div class="detail-box">
                         <span>ADDRESS</span>
+
                         <strong>
                             <?= e($selectedOrder["address"]) ?>
                         </strong>
@@ -550,6 +676,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
 
                     <div class="detail-box">
                         <span>CITY</span>
+
                         <strong>
                             <?= e($selectedOrder["city"]) ?>
                         </strong>
@@ -557,6 +684,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
 
                     <div class="detail-box">
                         <span>PROVINCE</span>
+
                         <strong>
                             <?= e($selectedOrder["province"]) ?>
                         </strong>
@@ -564,6 +692,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
 
                     <div class="detail-box">
                         <span>POSTAL CODE</span>
+
                         <strong>
                             <?= e($selectedOrder["postal_code"]) ?>
                         </strong>
@@ -571,6 +700,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
 
                     <div class="detail-box">
                         <span>SUBTOTAL</span>
+
                         <strong>
                             <?= money($selectedOrder["subtotal"]) ?>
                         </strong>
@@ -578,17 +708,26 @@ $adminName = $_SESSION["username"] ?? "Administrator";
 
                     <div class="detail-box">
                         <span>SHIPPING</span>
+
                         <strong>
+
                             <?php if ((float)$selectedOrder["shipping_fee"] > 0): ?>
+
                                 <?= money($selectedOrder["shipping_fee"]) ?>
+
                             <?php else: ?>
+
                                 FREE
+
                             <?php endif; ?>
+
                         </strong>
+
                     </div>
 
                     <div class="detail-box">
                         <span>TOTAL</span>
+
                         <strong>
                             <?= money($selectedOrder["total"]) ?>
                         </strong>
@@ -603,15 +742,18 @@ $adminName = $_SESSION["username"] ?? "Administrator";
                 <?php if (!empty($selectedOrderItems)): ?>
 
                     <div class="table-wrap">
+
                         <table class="items-table">
 
                             <thead>
+
                                 <tr>
                                     <th>PRODUCT</th>
                                     <th>PRICE</th>
                                     <th>QUANTITY</th>
                                     <th>SUBTOTAL</th>
                                 </tr>
+
                             </thead>
 
                             <tbody>
@@ -643,6 +785,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
                             </tbody>
 
                         </table>
+
                     </div>
 
                 <?php else: ?>
@@ -654,9 +797,11 @@ $adminName = $_SESSION["username"] ?? "Administrator";
                 <?php endif; ?>
 
                 <div class="details-summary">
+
                     <div class="details-summary-total">
                         TOTAL: <?= money($selectedOrder["total"]) ?>
                     </div>
+
                 </div>
 
                 <a
@@ -676,6 +821,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
             >
 
                 <div class="empty">
+
                     <h2 class="not-found-title">
                         ORDER NOT FOUND
                     </h2>
@@ -683,6 +829,7 @@ $adminName = $_SESSION["username"] ?? "Administrator";
                     <p>
                         Order #<?= (int)$viewId ?> does not exist.
                     </p>
+
                 </div>
 
                 <a

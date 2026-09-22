@@ -8,7 +8,7 @@ if (
     empty($_SESSION["user_id"]) ||
     ($_SESSION["role"] ?? "") !== "admin"
 ) {
-    header("Location: admin-login.php");
+    header("Location: ../login.php");
     exit;
 }
 
@@ -147,7 +147,9 @@ $totalAdmins = (int)$totalAdminsStmt->fetchColumn();
             alt="FROSTCORE Logo"
         >
 
-        <span>FROSTCORE ADMIN</span>
+        <span>
+            FROSTCORE ADMIN
+        </span>
 
     </a>
 
@@ -218,7 +220,9 @@ $totalAdmins = (int)$totalAdminsStmt->fetchColumn();
 
         <div class="page-title">
 
-            <h1>CUSTOMERS</h1>
+            <h1>
+                CUSTOMERS
+            </h1>
 
             <p>
                 View registered FROSTCORE accounts and account roles.
@@ -357,29 +361,37 @@ $totalAdmins = (int)$totalAdminsStmt->fetchColumn();
                                 <tr>
 
                                     <td>
+
                                         <span class="customer-id">
                                             #<?= (int)$user["id"] ?>
                                         </span>
+
                                     </td>
 
                                     <td>
+
                                         <span class="customer-name">
                                             <?= e($user["full_name"]) ?>
                                         </span>
+
                                     </td>
 
                                     <td>
+
                                         <span class="customer-email">
                                             <?= e($user["email"]) ?>
                                         </span>
+
                                     </td>
 
                                     <td>
+
                                         <span
                                             class="role-badge <?= e($roleClass) ?>"
                                         >
                                             <?= e(strtoupper($role)) ?>
                                         </span>
+
                                     </td>
 
                                 </tr>

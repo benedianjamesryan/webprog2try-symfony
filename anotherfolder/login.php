@@ -4,8 +4,12 @@ session_start();
 
 require_once "database/config.php";
 
-// If already logged in, skip the login page and go straight home
 if (!empty($_SESSION["user_id"])) {
+    if (($_SESSION["role"] ?? "") === "admin") {
+        header("Location: admin/dashboard.php");
+        exit;
+    }
+
     $redirect =
         $_GET["redirect"] ??
         $_POST["redirect"] ??
@@ -42,25 +46,19 @@ if (
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Detect if this came from the floating login modal (fetch/AJAX)
     $isAjax =
         (($_SERVER["HTTP_X_REQUESTED_WITH"] ?? "") === "XMLHttpRequest") ||
-        str_contains($_SERVER["HTTP_ACCEPT"] ?? "", "application/json");
+        str_contains(
+            $_SERVER["HTTP_ACCEPT"] ?? "",
+            "application/json"
+        );
 
     $email = trim($_POST["email"] ?? "");
     $password = $_POST["password"] ?? "";
 
-    if (
-        $email === "" ||
-        $password === ""
-    ) {
+    if ($email === "" || $password === "") {
         $error = "Please enter your email and password.";
-    } elseif (
-        !filter_var(
-            $email,
-            FILTER_VALIDATE_EMAIL
-        )
-    ) {
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Please enter a valid email address.";
     } else {
         $stmt = $pdo->prepare("
@@ -75,13 +73,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             LIMIT 1
         ");
 
-        $stmt->execute([
-            $email
-        ]);
+        $stmt->execute([$email]);
 
-        $user = $stmt->fetch(
-            PDO::FETCH_ASSOC
-        );
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (
             !$user ||
@@ -96,42 +90,39 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             session_regenerate_id(true);
 
-            $_SESSION["user_id"] =
-                (int)$user["id"];
+            $_SESSION["user_id"] = (int)$user["id"];
+            $_SESSION["username"] = (string)$user["full_name"];
+            $_SESSION["email"] = (string)$user["email"];
+            $_SESSION["role"] = (string)$user["role"];
 
-            $_SESSION["username"] =
-                (string)$user["full_name"];
-
-            $_SESSION["email"] =
-                (string)$user["email"];
-
-            $_SESSION["role"] =
-                (string)$user["role"];
+            if ($_SESSION["role"] === "admin") {
+                $redirect = "admin/dashboard.php";
+            }
 
             if ($isAjax) {
                 header("Content-Type: application/json");
+
                 echo json_encode([
                     "success" => true,
-                    "redirect" => $redirect,
+                    "redirect" => $redirect
                 ]);
+
                 exit;
             }
 
-            header(
-                "Location: " . $redirect
-            );
-
+            header("Location: " . $redirect);
             exit;
         }
     }
 
-    // If we got here, $error is set — respond accordingly
     if ($isAjax) {
         header("Content-Type: application/json");
+
         echo json_encode([
             "success" => false,
-            "error" => $error,
+            "error" => $error
         ]);
+
         exit;
     }
 }
@@ -144,10 +135,12 @@ $year = date("Y");
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
+
     <title>FROSTCORE — Login</title>
 
     <link
@@ -189,6 +182,7 @@ $year = date("Y");
 
 <main class="login-page-main">
     <div class="login-card">
+
         <img
             class="login-logo"
             src="assets/logo/frostcore_logo.png"
@@ -277,10 +271,12 @@ $year = date("Y");
                 CREATE ACCOUNT
             </a>
         </p>
+
     </div>
 </main>
 
 <footer class="footer-bottom login-footer">
+
     <span>
         © <?= htmlspecialchars(
             $year,
@@ -294,6 +290,7 @@ $year = date("Y");
     <span>
         STAY COOL. PLAY BETTER.
     </span>
+
 </footer>
 
 </body>
