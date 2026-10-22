@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ product.name }} — FROSTCORE</title>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/product-details.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/products.css?v=5') }}">
+    <link rel="stylesheet" href="{{ asset('css/logout.css?v=1') }}">
+</head>
+<body>
+{% include 'store/_header.html.twig' %}
+<main class="product-details-main">
+    <p><a href="{{ path('app_products') }}">← Back to products</a></p>
+    {% for message in app.flashes('success') %}<p class="notice-success">{{ message }}</p>{% endfor %}
+    {% for message in app.flashes('error') %}<p class="notice-error" role="alert">{{ message }}</p>{% endfor %}
+    <section class="product-details">
+        <div class="product-details-image"><img src="{{ asset(product.image) }}" alt="{{ product.name }}"></div>
+        <div class="product-details-info">
+            <p>{{ product.category }}</p>
+            <h1>{{ product.name }}</h1>
+            <p>★ {{ product.rating }} · {{ product.stock > 0 ? product.stock ~ ' available' : 'Out of stock' }}</p>
+            <p>{{ product.description }}</p>
+            <strong>₱{{ product.price|number_format(2) }}</strong>
+            {% if product.stock > 0 %}
+                {% if app.user %}
+                    <form action="{{ path('app_cart_add', {id: product.id}) }}" method="post">
+                        <input type="hidden" name="_token" value="{{ csrf_token('cart_add_' ~ product.id) }}">
+                        <label for="quantity">Quantity</label>
+                        <input id="quantity" name="quantity" type="number" min="1" max="{{ product.stock }}" value="1">
+                        <button class="btn" type="submit">ADD TO CART</button>
+                    </form>
+                {% else %}
+                    <p><a class="btn" href="{{ path('app_login') }}">SIGN IN TO SHOP</a></p>
+                {% endif %}
+            {% endif %}
+        </div>
+    </section>
+    <section class="product-reviews">
+        <h2>Customer reviews</h2>
+        {% for review in reviews %}
+            <article class="review-item"><strong>{{ review.user.fullName }}</strong><span>★ {{ review.rating }}/5</span><p>{{ review.reviewText }}</p></article>
+        {% else %}
+            <p>No reviews yet.</p>
+        {% endfor %}
+        {% if app.user %}
+            <form action="{{ path('app_product_details', {id: product.id}) }}" method="post">
+                <input type="hidden" name="_token" value="{{ csrf_token('review_' ~ product.id) }}">
+                <label for="rating">Your rating</label>
+                <select id="rating" name="rating" required><option value="">Choose a rating</option>{% for rating in 5..1 %}<option value="{{ rating }}">{{ rating }} / 5</option>{% endfor %}</select>
+                <label for="review_text">Your review</label>
+                <textarea id="review_text" name="review_text" maxlength="1000" required></textarea>
+                <button class="btn" type="submit">SUBMIT REVIEW</button>
+            </form>
+        {% else %}
+            <p><a href="{{ path('app_login') }}">Sign in</a> to write a review.</p>
+        {% endif %}
+    </section>
+</main>
+</body>
+</html>

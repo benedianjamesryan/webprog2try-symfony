@@ -1,0 +1,12 @@
+<aside class="admin-sidebar">
+    <p class="sidebar-title">ADMIN MENU</p>
+    <a class="{{ active_page == 'dashboard' ? 'active' : '' }}" href="{{ path('admin_dashboard') }}">Dashboard</a>
+    <a class="{{ active_page == 'products' ? 'active' : '' }}" href="{{ path('admin_products') }}">Products</a>
+    <a class="{{ active_page == 'brands' ? 'active' : '' }}" href="{{ path('admin_brand_index') }}">Brands</a>
+    <a class="{{ active_page == 'orders' ? 'active' : '' }}" href="{{ path('admin_orders') }}">Orders</a>
+    <a class="{{ active_page == 'customers' ? 'active' : '' }}" href="{{ path('admin_customers') }}">Customers</a>
+    <a class="{{ active_page == 'reviews' ? 'active' : '' }}" href="{{ path('admin_reviews') }}">Reviews</a>
+    <a href="{{ path('home') }}">View storefront</a>
+    <a href="{{ path('app_about') }}">About us</a>
+    <a href="{{ path('app_contact') }}">Contact</a>
+</aside>

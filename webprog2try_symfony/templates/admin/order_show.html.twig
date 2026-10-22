@@ -1,0 +1,45 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Order {{ order.orderNumber }} — FROSTCORE Admin{% endblock %}
+{% block active_page %}orders{% endblock %}
+{% block admin_stylesheet %}<link rel="stylesheet" href="{{ asset('css/admin/orders.css') }}">{% endblock %}
+
+{% block admin_content %}
+    <section class="page-title">
+        <h1>Order {{ order.orderNumber }}</h1>
+        <p>Placed {{ order.createdAt|date('M j, Y H:i') }}</p>
+    </section>
+    <section class="admin-card">
+        <h2>Customer and delivery</h2>
+        <p><strong>{{ order.fullName }}</strong> · {{ order.email }} · {{ order.phone }}</p>
+        <p>{{ order.address }}, {{ order.city }}, {{ order.province }} {{ order.postalCode }}</p>
+        <p>Payment method: {{ order.paymentMethod }}</p>
+    </section>
+    <section class="admin-card">
+        <h2>Items</h2>
+        <div class="table-wrap">
+            <table class="orders-table">
+                <thead><tr><th>PRODUCT</th><th>UNIT PRICE</th><th>QUANTITY</th><th>SUBTOTAL</th></tr></thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr><td>{{ item.productName }}</td><td>₱{{ item.price|number_format(2) }}</td><td>{{ item.quantity }}</td><td class="order-total">₱{{ item.subtotal|number_format(2) }}</td></tr>
+                    {% else %}
+                        <tr><td colspan="4" class="empty-state">This order has no items.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p>Subtotal: ₱{{ order.subtotal|number_format(2) }}</p>
+        <p>Shipping: ₱{{ order.shippingFee|number_format(2) }}</p>
+        <p class="order-total">Total: ₱{{ order.total|number_format(2) }}</p>
+    </section>
+    <section class="admin-card">
+        <h2>Update status</h2>
+        <form class="status-form" method="post" action="{{ path('admin_order_show', {id: order.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('admin_order_' ~ order.id) }}">
+            <select name="status">{% for status in statuses %}<option value="{{ status }}" {{ order.status == status ? 'selected' : '' }}>{{ status }}</option>{% endfor %}</select>
+            <button type="submit">SAVE STATUS</button>
+        </form>
+        <p><a class="view-button" href="{{ path('admin_orders') }}">← BACK TO ORDERS</a></p>
+    </section>
+{% endblock %}

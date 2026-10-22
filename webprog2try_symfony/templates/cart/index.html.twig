@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Your Cart — FROSTCORE</title>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/products.css?v=5') }}">
+    <link rel="stylesheet" href="{{ asset('css/logout.css?v=1') }}">
+    <link rel="stylesheet" href="{{ asset('css/cart.css') }}">
+</head>
+<body>
+{% include 'store/_header.html.twig' %}
+<main class="cart-page">
+    <div class="cart-title">
+        <h1>Your shopping cart</h1>
+        <p>Review your items, update quantities, or continue browsing.</p>
+    </div>
+    {% for message in app.flashes('success') %}<p class="notice-success">{{ message }}</p>{% endfor %}
+    {% for message in app.flashes('error') %}<p class="notice-error" role="alert">{{ message }}</p>{% endfor %}
+    {% if cartLines is empty %}
+        <section class="empty-cart">
+            <h2>Your cart is empty</h2>
+            <p>Find a cooler for your setup, then come back here to check out.</p>
+            <a class="continue-shopping" href="{{ path('app_products') }}">BROWSE COOLERS</a>
+        </section>
+    {% else %}
+        <div class="cart-layout">
+            <div>
+                <div class="cart-items">
+                    {% for line in cartLines %}
+                        {% set item = line.item %}
+                        <article class="cart-item">
+                            <a class="cart-item-image" href="{{ path('app_product_details', {id: item.product.id}) }}">
+                                <img src="{{ asset(item.product.image) }}" alt="{{ item.product.name }}">
+                            </a>
+                            <div class="cart-item-info">
+                                <p class="cart-item-category">{{ item.product.category }}</p>
+                                <h2><a href="{{ path('app_product_details', {id: item.product.id}) }}">{{ item.product.name }}</a></h2>
+                                <p class="cart-item-price">₱{{ item.product.price|number_format(2) }}</p>
+                                <div class="cart-item-actions">
+                                    <form class="quantity-form" action="{{ path('app_cart_update', {id: item.id}) }}" method="post">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('cart_update_' ~ item.id) }}">
+                                        <label for="quantity-{{ item.id }}">Qty</label>
+                                        <input id="quantity-{{ item.id }}" name="quantity" type="number" min="1" max="{{ item.product.stock }}" value="{{ item.quantity }}" required>
+                                        <button type="submit">UPDATE</button>
+                                    </form>
+                                    <form action="{{ path('app_cart_remove', {id: item.id}) }}" method="post">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('cart_remove_' ~ item.id) }}">
+                                        <button class="remove-button" type="submit">REMOVE</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <strong>₱{{ line.line_total }}</strong>
+                        </article>
+                    {% endfor %}
+                </div>
+                <a class="continue-shopping cart-continue-link" href="{{ path('app_products') }}">← CONTINUE SHOPPING</a>
+            </div>
+            <aside class="cart-summary">
+                <h2>Order summary</h2>
+                <div class="summary-row"><span>Shipping</span><strong>FREE</strong></div>
+                <div class="summary-total"><span>Subtotal</span><strong>₱{{ total }}</strong></div>
+                <a class="checkout-button" href="{{ path('app_checkout') }}">PROCEED TO CHECKOUT</a>
+                <form class="clear-cart-form" action="{{ path('app_cart_clear') }}" method="post">
+                    <input type="hidden" name="_token" value="{{ csrf_token('cart_clear') }}">
+                    <button class="clear-cart-button" type="submit">CLEAR CART</button>
+                </form>
+            </aside>
+        </div>
+    {% endif %}
+</main>
+</body>
+</html>

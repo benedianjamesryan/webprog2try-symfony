@@ -1,0 +1,32 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Admin Dashboard — FROSTCORE{% endblock %}
+{% block active_page %}dashboard{% endblock %}
+
+{% block admin_content %}
+    <section class="page-title"><h1>Dashboard</h1><p>FROSTCORE store overview</p></section>
+    <section class="stats-grid">
+        <article class="stat-card"><div class="stat-label">PRODUCTS</div><div class="stat-value">{{ productCount }}</div></article>
+        <article class="stat-card"><div class="stat-label">CUSTOMERS</div><div class="stat-value">{{ customerCount }}</div></article>
+        <article class="stat-card"><div class="stat-label">ORDERS</div><div class="stat-value">{{ orderCount }}</div></article>
+        <article class="stat-card"><div class="stat-label">PENDING</div><div class="stat-value">{{ pendingCount }}</div></article>
+        <article class="stat-card"><div class="stat-label">OUT OF STOCK</div><div class="stat-value">{{ outOfStockCount }}</div></article>
+        <article class="stat-card"><div class="stat-label">ORDER VALUE</div><div class="stat-value order-value">₱{{ totalSales|number_format(2) }}</div></article>
+    </section>
+    <div class="content-grid">
+        <section class="admin-card">
+            <h2>Recent orders</h2>
+            <div class="admin-table-wrap"><table class="admin-table">
+                <thead><tr><th>ORDER</th><th>CUSTOMER</th><th>DATE</th><th>STATUS</th><th>TOTAL</th></tr></thead>
+                <tbody>{% for order in recentOrders %}
+                    <tr><td class="order-number">{{ order.orderNumber }}</td><td>{{ order.fullName }}</td><td>{{ order.createdAt|date('M j') }}</td><td><span class="status status-{{ order.status|lower }}">{{ order.status }}</span></td><td class="order-total">₱{{ order.total|number_format(2) }}</td></tr>
+                {% else %}<tr><td colspan="5" class="empty-state">No orders yet.</td></tr>{% endfor %}</tbody>
+            </table></div>
+        </section>
+        <section class="admin-card">
+            <h2>Low stock (5 or fewer)</h2>
+            {% for product in lowStock %}<div class="low-stock-item"><div><div class="low-stock-name">{{ product.name }}</div><div class="low-stock-price">₱{{ product.price|number_format(2) }}</div></div><span class="stock-number">{{ product.stock }}</span></div>{% else %}<p class="empty-state">All products are well stocked.</p>{% endfor %}
+        </section>
+    </div>
+    <section class="admin-card"><h2>Quick actions</h2><div class="quick-actions"><a class="quick-action" href="{{ path('admin_product_new') }}">ADD PRODUCT</a><a class="quick-action" href="{{ path('admin_orders') }}">MANAGE ORDERS</a></div></section>
+{% endblock %}

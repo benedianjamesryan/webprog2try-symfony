@@ -1,0 +1,15 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Reviews — FROSTCORE{% endblock %}
+{% block active_page %}reviews{% endblock %}
+{% block admin_stylesheet %}<link rel="stylesheet" href="{{ asset('css/admin/reviews.css') }}">{% endblock %}
+
+{% block admin_content %}
+    <section class="page-title"><h1>Reviews</h1><p>Customer feedback for FROSTCORE products.</p></section>
+    <div class="reviews-card"><div class="table-wrap"><table class="reviews-table">
+        <thead><tr><th>ID</th><th>REVIEWER</th><th>PRODUCT</th><th>RATING</th><th>REVIEW</th><th>DATE</th><th>ACTION</th></tr></thead>
+        <tbody>{% for review in reviews %}
+            <tr><td class="review-id">#{{ review.id }}</td><td><div class="reviewer-name">{{ review.user.fullName }}</div><div class="reviewer-email">{{ review.user.email }}</div></td><td><div class="product-name">{{ review.product.name }}</div></td><td class="rating">{{ review.rating }}/5</td><td class="review-text">{{ review.reviewText }}</td><td class="review-date">{{ review.createdAt|date('M j, Y') }}</td><td><form method="post" action="{{ path('admin_reviews') }}" onsubmit="return confirm('Delete this review?')"><input type="hidden" name="review_id" value="{{ review.id }}"><input type="hidden" name="_token" value="{{ csrf_token('admin_review_' ~ review.id) }}"><button class="delete-button" type="submit">DELETE</button></form></td></tr>
+        {% else %}<tr><td colspan="7" class="empty-state">No reviews yet.</td></tr>{% endfor %}</tbody>
+    </table></div></div>
+{% endblock %}

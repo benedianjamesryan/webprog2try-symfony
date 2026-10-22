@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>About FROSTCORE</title>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/about.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/products.css?v=5') }}">
+    <link rel="stylesheet" href="{{ asset('css/logout.css?v=1') }}">
+</head>
+<body>
+{% include 'store/_header.html.twig' %}
+<main class="about-page">
+    <section class="about-hero">
+        <span class="about-eyebrow">BUILT FOR LONGER, COOLER SESSIONS</span>
+        <h1>About FROSTCORE</h1>
+        <p>FROSTCORE makes practical cooling accessories for gamers and creators. We focus on dependable airflow, thoughtful design, and helping your devices stay comfortable during demanding sessions.</p>
+    </section>
+    <section class="about-grid">
+        <article class="about-card"><h2>Our mission</h2><p>Give players simple tools to manage heat, reduce thermal throttling, and spend more time focused on the game.</p></article>
+        <article class="about-card"><h2>Designed around your setup</h2><p>From compact phone coolers to laptop stands and bundles, our catalog is built for different devices and play spaces.</p></article>
+    </section>
+    <section class="values-section">
+        <h2>What matters to us</h2>
+        <div class="values-grid">
+            <article class="value-card"><strong>PERFORMANCE</strong><p>Useful cooling for real-world gaming sessions.</p></article>
+            <article class="value-card"><strong>COMPATIBILITY</strong><p>Options for phones, laptops, and complete setups.</p></article>
+            <article class="value-card"><strong>COMMUNITY</strong><p>Feedback and reviews help us serve gamers better.</p></article>
+        </div>
+    </section>
+    <section class="about-cta"><p>Ready to find your next cooler?</p><a href="{{ path('app_products') }}">SHOP PRODUCTS</a></section>
+</main>
+<footer class="about-footer"><div class="about-footer-top"><div><h3>FROSTCORE</h3><p>Stay cool. Play better.</p></div><div><a href="{{ path('app_products') }}">Shop</a>{% if app.user %}<br><a href="{{ path('app_contact') }}">Contact</a>{% endif %}</div></div><p class="footer-copy">© {{ 'now'|date('Y') }} FROSTCORE</p></footer>
+</body>
+</html>

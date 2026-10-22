@@ -1,0 +1,22 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Manage Orders — FROSTCORE{% endblock %}
+{% block active_page %}orders{% endblock %}
+{% block admin_stylesheet %}<link rel="stylesheet" href="{{ asset('css/admin/orders.css') }}">{% endblock %}
+
+{% block admin_content %}
+    <section class="page-title"><h1>Orders</h1><p>Review orders and update fulfillment status.</p></section>
+    <nav class="filter-bar"><a class="{{ status == '' ? 'active' : '' }}" href="{{ path('admin_orders') }}">All</a>{% for option in statuses %}<a class="{{ status == option ? 'active' : '' }}" href="{{ path('admin_orders', {status: option}) }}">{{ option }}</a>{% endfor %}</nav>
+    <div class="orders-card"><div class="table-wrap"><table class="orders-table">
+        <thead><tr><th>ORDER</th><th>CUSTOMER</th><th>DELIVERY</th><th>PAYMENT</th><th>TOTAL</th><th>STATUS</th><th>VIEW / UPDATE</th></tr></thead>
+        <tbody>{% for order in orders %}
+            <tr><td class="order-number">{{ order.orderNumber }}<div class="sub-info">{{ order.createdAt|date('M j, Y H:i') }}</div></td>
+                <td>{{ order.fullName }}<div class="sub-info">{{ order.email }} · {{ order.phone }}</div></td>
+                <td>{{ order.address }}, {{ order.city }}<div class="sub-info">{{ order.province }} {{ order.postalCode }}</div></td>
+                <td>{{ order.paymentMethod }}</td><td class="order-total">₱{{ order.total|number_format(2) }}</td>
+                <td><span class="status status-{{ order.status|lower }}">{{ order.status }}</span></td>
+                <td><div class="action-area"><a class="view-button" href="{{ path('admin_order_show', {id: order.id}) }}">VIEW ORDER</a><form class="status-form" method="post" action="{{ path('admin_orders') }}"><input type="hidden" name="order_id" value="{{ order.id }}"><input type="hidden" name="_token" value="{{ csrf_token('admin_order_' ~ order.id) }}"><select name="status">{% for option in statuses %}<option value="{{ option }}" {{ order.status == option ? 'selected' : '' }}>{{ option }}</option>{% endfor %}</select><button type="submit">SAVE</button></form></div></td>
+            </tr>
+        {% else %}<tr><td colspan="7" class="empty-state">No orders found.</td></tr>{% endfor %}</tbody>
+    </table></div></div>
+{% endblock %}

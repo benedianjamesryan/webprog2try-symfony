@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Shop FROSTCORE Coolers</title>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/products.css?v=6') }}">
+    <link rel="stylesheet" href="{{ asset('css/logout.css?v=1') }}">
+</head>
+<body>
+{% include 'store/_header.html.twig' %}
+<section class="products-hero"><div class="hero-content"><div class="breadcrumbs"><a href="{{ path('home') }}">Home</a><span>/</span><span>Shop</span></div><h1>Cooling, <span>engineered.</span></h1><p>Find the right FROSTCORE cooler for your setup.</p><div class="hero-line"></div></div></section>
+<main class="products-main">
+    <aside class="filter-sidebar">
+        <form method="get" action="{{ path('app_products') }}">
+            <div class="filter-section">
+                <h2>CATEGORY</h2>
+                <select name="category" data-auto-submit>
+                    <option value="">All products</option>
+                    {% for option in categories %}<option value="{{ option }}" {{ filters.category == option ? 'selected' : '' }}>{{ option }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="filter-section">
+                <h2>SEARCH</h2>
+                <input type="search" name="q" value="{{ filters.query }}" placeholder="Product name">
+            </div>
+            <div class="filter-section">
+                <h2>PRICE RANGE</h2>
+                <input type="number" name="minPrice" min="0" step="0.01" value="{{ filters.minPrice }}" placeholder="Minimum">
+                <input type="number" name="maxPrice" min="0" step="0.01" value="{{ filters.maxPrice }}" placeholder="Maximum">
+            </div>
+            <div class="filter-section">
+                <h2>MINIMUM RATING</h2>
+                <select name="minRating">
+                    <option value="">Any rating</option>
+                    {% for rating in [3, 4, 4.5] %}<option value="{{ rating }}" {{ filters.minRating == rating ? 'selected' : '' }}>{{ rating }}+ stars</option>{% endfor %}
+                </select>
+                <label><input type="checkbox" name="inStock" value="1" {{ filters.inStock ? 'checked' : '' }}> In stock only</label>
+            </div>
+            <div class="filter-section">
+                <h2>SORT BY</h2>
+                <select name="sort">
+                    <option value="featured" {{ filters.sort == 'featured' ? 'selected' : '' }}>Featured</option>
+                    <option value="price_asc" {{ filters.sort == 'price_asc' ? 'selected' : '' }}>Price: low to high</option>
+                    <option value="price_desc" {{ filters.sort == 'price_desc' ? 'selected' : '' }}>Price: high to low</option>
+                    <option value="rating_desc" {{ filters.sort == 'rating_desc' ? 'selected' : '' }}>Top rated</option>
+                    <option value="name" {{ filters.sort == 'name' ? 'selected' : '' }}>Name</option>
+                </select>
+            </div>
+            <button class="btn" type="submit">APPLY FILTERS</button>
+        </form>
+    </aside>
+    <section class="products-results">
+        <div class="products-results-heading"><p>{{ products|length }} product{{ products|length == 1 ? '' : 's' }}</p></div>
+        <div class="product-grid">
+            {% for product in products %}
+                <article class="product-card">
+                    <a class="product-image" href="{{ path('app_product_details', {id: product.id}) }}"><img src="{{ asset(product.image) }}" alt="{{ product.name }}"></a>
+                    <div class="product-card-content">
+                        <p class="product-category">{{ product.category }}</p>
+                        <h2><a href="{{ path('app_product_details', {id: product.id}) }}">{{ product.name }}</a></h2>
+                        <p class="product-rating">★ {{ product.rating }} <span>· {{ product.stock > 0 ? 'In stock' : 'Out of stock' }}</span></p>
+                        <strong class="product-price">₱{{ product.price|number_format(2) }}</strong>
+                        <div class="product-buttons">
+                            <a class="view-button" href="{{ path('app_product_details', {id: product.id}) }}">DETAILS</a>
+                            {% if product.stock > 0 %}
+                                <form action="{{ path('app_cart_add', {id: product.id}) }}" method="post">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('cart_add_' ~ product.id) }}">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button class="cart-button" type="submit">ADD TO CART</button>
+                                </form>
+                            {% else %}
+                                <button class="cart-button disabled" type="button" disabled>OUT OF STOCK</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+            {% else %}
+                <p>No products match those filters. <a href="{{ path('app_products') }}">Clear filters</a>.</p>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+<script src="{{ asset('js/products.js?v=1') }}" defer></script>
+</body>
+</html>

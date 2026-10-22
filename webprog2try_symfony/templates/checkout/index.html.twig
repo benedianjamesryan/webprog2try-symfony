@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Checkout — FROSTCORE</title>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/products.css?v=5') }}">
+    <link rel="stylesheet" href="{{ asset('css/logout.css?v=1') }}">
+    <link rel="stylesheet" href="{{ asset('css/checkout.css?v=3') }}">
+</head>
+<body>
+{% include 'store/_header.html.twig' %}
+<main class="checkout-page">
+    <div class="checkout-title">
+        <h1>Delivery details</h1>
+        <p>Enter your delivery information and review your order before placing it.</p>
+    </div>
+
+    {% for message in app.flashes('error') %}
+        <div class="checkout-errors" role="alert">{{ message }}</div>
+    {% endfor %}
+
+    <form action="{{ path('app_checkout') }}" method="post">
+        <input type="hidden" name="_token" value="{{ csrf_token('checkout') }}">
+        <div class="checkout-layout">
+            <div>
+                <section class="checkout-section">
+                    <h2>Delivery information</h2>
+                    <div class="checkout-form-grid">
+                        <div class="checkout-field">
+                            <label for="full_name">Full name</label>
+                            <input id="full_name" name="full_name" type="text" maxlength="150" autocomplete="name" value="{{ account.fullName }}" required>
+                        </div>
+                        <div class="checkout-field">
+                            <label for="email">Email address</label>
+                            <input id="email" name="email" type="email" maxlength="190" autocomplete="email" value="{{ account.email }}" required>
+                        </div>
+                        <div class="checkout-field">
+                            <label for="phone">Phone number</label>
+                            <input id="phone" name="phone" type="tel" maxlength="40" autocomplete="tel" required>
+                        </div>
+                        <div class="checkout-field full">
+                            <label for="address">Street address</label>
+                            <input id="address" name="address" type="text" maxlength="255" autocomplete="street-address" required>
+                        </div>
+                        <div class="checkout-field">
+                            <label for="city">City</label>
+                            <input id="city" name="city" type="text" maxlength="100" autocomplete="address-level2" required>
+                        </div>
+                        <div class="checkout-field">
+                            <label for="province">Province</label>
+                            <input id="province" name="province" type="text" maxlength="100" autocomplete="address-level1" required>
+                        </div>
+                        <div class="checkout-field">
+                            <label for="postal_code">Postal code</label>
+                            <input id="postal_code" name="postal_code" type="text" maxlength="20" autocomplete="postal-code" required>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="checkout-section">
+                    <h2>Payment method</h2>
+                    <div class="payment-options">
+                        <label class="payment-option">
+                            <input type="radio" name="payment_method" value="COD" checked required aria-controls="codDetails">
+                            <span>Cash on delivery (COD)</span>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment_method" value="GCash" required aria-controls="gcashDetails">
+                            <span>GCash mobile wallet</span>
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment_method" value="Card" required aria-controls="cardDetails">
+                            <span>Credit or debit card</span>
+                        </label>
+                    </div>
+                    <div class="payment-details" id="codDetails" hidden>
+                        <p class="payment-description">Pay the delivery driver in cash when your order arrives.</p>
+                    </div>
+                    <div class="payment-details" id="gcashDetails" hidden>
+                        <div class="checkout-field">
+                            <label for="gcash_number">GCash mobile number</label>
+                            <input id="gcash_number" type="tel" inputmode="numeric" autocomplete="off" placeholder="09XXXXXXXXX" maxlength="11" pattern="09[0-9]{9}" aria-describedby="gcash-help">
+                            <small id="gcash-help">Enter the 11-digit mobile number linked to your GCash wallet.</small>
+                        </div>
+                    </div>
+                    <div class="payment-details" id="cardDetails" hidden>
+                        <div class="checkout-form-grid">
+                            <div class="checkout-field full">
+                                <label for="card_number">Card number</label>
+                                <input id="card_number" type="text" inputmode="numeric" autocomplete="off" placeholder="1234 5678 9012 3456" maxlength="19" pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}" aria-describedby="card-help">
+                            </div>
+                            <div class="checkout-field full">
+                                <label for="card_name">Name on card</label>
+                                <input id="card_name" type="text" autocomplete="off" maxlength="100" placeholder="Name as shown on card">
+                            </div>
+                            <div class="checkout-field">
+                                <label for="card_expiry">Expiry date</label>
+                                <input id="card_expiry" type="month" autocomplete="off">
+                            </div>
+                            <div class="checkout-field">
+                                <label for="card_cvv">Security code (CVV)</label>
+                                <input id="card_cvv" type="password" inputmode="numeric" autocomplete="off" maxlength="4" pattern="[0-9]{3,4}" placeholder="3 or 4 digits">
+                            </div>
+                        </div>
+                        <small id="card-help">Enter the card number, cardholder name, expiry date, and 3- or 4-digit security code.</small>
+                    </div>
+                    <p class="checkout-note">Payment details are for this checkout demo only. Do not enter real GCash or card details. They are not sent to the server, processed, or saved.</p>
+                </section>
+            </div>
+
+            <aside class="checkout-summary">
+                <h2>Your order</h2>
+                {% for item in cartItems %}
+                    <div class="checkout-item">
+                        <a class="checkout-item-image" href="{{ path('app_product_details', {id: item.product.id}) }}">
+                            <img src="{{ asset(item.product.image) }}" alt="{{ item.product.name }}">
+                        </a>
+                        <div class="checkout-item-info">
+                            <h3>{{ item.product.name }}</h3>
+                            <p>{{ item.quantity }} × ₱{{ item.product.price|number_format(2) }}</p>
+                        </div>
+                        <span class="checkout-item-price">₱{{ (item.product.price * item.quantity)|number_format(2) }}</span>
+                    </div>
+                {% endfor %}
+                <div class="summary-row"><span>Shipping</span><strong>FREE</strong></div>
+                <div class="summary-total"><span>Total</span><strong>₱{{ total }}</strong></div>
+                <button class="place-order-button" type="submit">PLACE ORDER</button>
+                <a class="back-cart" href="{{ path('app_cart') }}">← Back to cart</a>
+            </aside>
+        </div>
+    </form>
+</main>
+<script src="{{ asset('js/checkout.js?v=1') }}" defer></script>
+</body>
+</html>

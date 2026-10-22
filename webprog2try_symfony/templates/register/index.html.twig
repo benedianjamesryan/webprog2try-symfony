@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Create account — FROSTCORE</title>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/register.css') }}?v=2">
+</head>
+<body class="register-page">
+<main class="register-main">
+    <section class="register-card">
+        <div class="register-brand">
+            <a href="{{ path('home') }}"><img class="register-logo" src="{{ asset('assets/logo/frostcore_logo.png') }}" alt="FROSTCORE"><span class="register-brand-name">FROSTCORE</span></a>
+        </div>
+        <h1>CREATE ACCOUNT</h1>
+        <p class="register-subtitle">Join the FROSTCORE community.</p>
+        {% for message in app.flashes('error') %}<p class="form-error" role="alert">{{ message }}</p>{% endfor %}
+        <form class="register-form" action="{{ path('app_register') }}" method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token('register') }}">
+            <div class="form-group"><label for="full_name">FULL NAME</label><input id="full_name" name="full_name" maxlength="150" autocomplete="name" required></div>
+            <div class="form-group"><label for="email">EMAIL</label><input id="email" name="email" type="email" maxlength="190" autocomplete="email" required></div>
+            <div class="form-group"><label for="password">PASSWORD</label><input id="password" name="password" type="password" minlength="8" autocomplete="new-password" required></div>
+            <div class="form-group"><label for="password_confirmation">CONFIRM PASSWORD</label><input id="password_confirmation" name="password_confirmation" type="password" minlength="8" autocomplete="new-password" required></div>
+            <label class="terms"><input type="checkbox" name="terms" value="1" required> I agree to the terms and conditions.</label>
+            <button class="btn" type="submit">CREATE ACCOUNT</button>
+        </form>
+        <p class="register-login">Already have an account? <a href="{{ path('app_login') }}">SIGN IN</a></p>
+        <p class="register-back-home"><a href="{{ path('home') }}">← Back to home</a></p>
+        {% if app.user %}<p><a href="{{ path('app_about') }}">About us</a> · <a href="{{ path('app_contact') }}">Contact</a></p>{% endif %}
+    </section>
+</main>
+</body>
+</html>

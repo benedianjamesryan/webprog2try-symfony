@@ -1,0 +1,16 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Customers — FROSTCORE{% endblock %}
+{% block active_page %}customers{% endblock %}
+{% block admin_stylesheet %}<link rel="stylesheet" href="{{ asset('css/admin/customers.css') }}">{% endblock %}
+
+{% block admin_content %}
+    <section class="page-title"><h1>Customers</h1><p>{{ customerCount }} customers · {{ adminCount }} administrators</p></section>
+    <div class="toolbar"><form class="search-form" method="get" action="{{ path('admin_customers') }}"><input name="q" value="{{ search }}" placeholder="Search name or email"><select name="role"><option value="">All roles</option><option value="customer" {{ role == 'customer' ? 'selected' : '' }}>Customer</option><option value="admin" {{ role == 'admin' ? 'selected' : '' }}>Admin</option></select><button type="submit">SEARCH</button></form></div>
+    <div class="customers-card"><div class="table-wrap"><table class="customers-table">
+        <thead><tr><th>ID</th><th>NAME</th><th>EMAIL</th><th>ROLE</th><th>JOINED</th></tr></thead>
+        <tbody>{% for user in users %}
+            <tr><td class="customer-id">#{{ user.id }}</td><td class="customer-name">{{ user.fullName }}</td><td class="customer-email">{{ user.email }}</td><td>{{ user.role|capitalize }}</td><td>{{ user.createdAt|date('M j, Y') }}</td></tr>
+        {% else %}<tr><td colspan="5" class="empty-state">No accounts found.</td></tr>{% endfor %}</tbody>
+    </table></div></div>
+{% endblock %}

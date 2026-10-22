@@ -1,0 +1,49 @@
+
+services:
+###> doctrine/doctrine-bundle ###
+  database:
+    image: mariadb:11.4
+    container_name: frostcore_mysql
+    environment:
+      MARIADB_DATABASE: frostcore_db
+      MARIADB_USER: frostcore
+      MARIADB_PASSWORD: ${DB_PASSWORD:-frostcore_dev_password}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-frostcore_root_dev_password}
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - frostcore_mysql_data:/var/lib/mysql
+    networks:
+      - frostcore_net
+    restart: unless-stopped
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    container_name: frostcore_phpmyadmin
+    environment:
+      PMA_HOST: database
+      PMA_PORT: 3306
+    ports:
+      - "8080:80"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - frostcore_net
+    restart: unless-stopped
+###< doctrine/doctrine-bundle ###
+
+networks:
+  frostcore_net:
+    name: frostcore_net
+
+volumes:
+###> doctrine/doctrine-bundle ###
+  frostcore_mysql_data:
+    name: frostcore_mysql_data
+###< doctrine/doctrine-bundle ###

@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}FROSTCORE Admin{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/admin/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/logout.css?v=1') }}">
+    {% block admin_stylesheet %}{% endblock %}
+{% endblock %}
+
+{% block body %}
+<header class="admin-header">
+    <a class="admin-brand" href="{{ path('admin_dashboard') }}"><img src="{{ asset('assets/logo/frostcore_logo.png') }}" alt=""><span>FROSTCORE ADMIN</span></a>
+    <div class="admin-header-right">
+        <a class="admin-logout" href="{{ path('home') }}">STOREFRONT</a>
+        <a class="admin-logout" href="{{ path('app_my_orders') }}">MY ORDERS</a>
+        <a class="admin-logout" href="{{ path('app_cart') }}">CART</a>
+        <form action="{{ path('app_logout') }}" method="post" data-logout-confirm><input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}"><button class="admin-logout" type="submit">LOG OUT</button></form>
+    </div>
+</header>
+{% include 'store/_logout_confirmation.html.twig' %}
+{% set active_page = block('active_page') %}
+<div class="admin-layout">
+    {% include 'admin/_sidebar.html.twig' %}
+    <main class="admin-main">
+        {% for message in app.flashes('success') %}<p class="message success">{{ message }}</p>{% endfor %}
+        {% for message in app.flashes('error') %}<p class="message error">{{ message }}</p>{% endfor %}
+        {% block admin_content %}{% endblock %}
+    </main>
+</div>
+{% endblock %}

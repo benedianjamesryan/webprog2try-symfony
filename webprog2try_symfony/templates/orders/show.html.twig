@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ order.orderNumber }} — FROSTCORE</title>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/my-orders.css?v=2') }}">
+    <link rel="stylesheet" href="{{ asset('css/products.css?v=5') }}">
+    <link rel="stylesheet" href="{{ asset('css/logout.css?v=1') }}">
+</head>
+<body>
+{% include 'store/_header.html.twig' %}
+<main class="orders-page">
+    <a class="back-orders" href="{{ path('app_my_orders') }}">← ALL ORDERS</a>
+    <section class="orders-title">
+        <h1>Order details</h1>
+        <p>{{ order.orderNumber }}</p>
+    </section>
+    <section class="order-details">
+        <div class="details-heading">
+            <div>
+                <h2>Order summary</h2>
+                <p>Placed {{ order.createdAt|date('M j, Y H:i') }}</p>
+            </div>
+            <span class="status status-{{ order.status|lower }}">{{ order.status }}</span>
+        </div>
+        <div class="details-grid">
+            <div class="details-box"><span>PAYMENT METHOD</span><strong>{{ order.paymentMethod }}</strong></div>
+            <div class="details-box"><span>SHIPPING</span><strong>FREE</strong></div>
+            <div class="details-box"><span>DELIVERING TO</span><strong>{{ order.fullName }}<br>{{ order.address }}, {{ order.city }}, {{ order.province }} {{ order.postalCode }}</strong></div>
+            <div class="details-box"><span>PHONE</span><strong>{{ order.phone }}</strong></div>
+        </div>
+        <h2 class="items-heading">Items</h2>
+        <div class="items-table-wrap">
+            <table class="items-table">
+                <thead><tr><th>PRODUCT</th><th>QUANTITY</th><th>SUBTOTAL</th></tr></thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr><td>{{ item.productName }}</td><td>{{ item.quantity }}</td><td class="item-total">₱{{ item.subtotal|number_format(2) }}</td></tr>
+                    {% else %}
+                        <tr><td colspan="3" class="no-items-message">No items found for this order.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="details-footer">
+            <a class="back-orders" href="{{ path('app_my_orders') }}">← BACK TO ALL ORDERS</a>
+            <strong class="grand-total">₱{{ order.total|number_format(2) }}</strong>
+        </div>
+    </section>
+</main>
+</body>
+</html>

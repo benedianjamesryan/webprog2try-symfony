@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>FROSTCORE — Login</title>
+
+    <!-- Main FROSTCORE CSS -->
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
+    <!-- Login Page CSS -->
+    <link rel="stylesheet" href="{{ asset('css/login.css?v=2') }}">
+
+</head>
+
+
+<body class="login-page">
+
+    <main class="login-page-main">
+
+        <div class="login-card">
+
+            <!-- LOGO -->
+
+            <img
+                class="login-logo"
+                src="{{ asset('assets/logo/frostcore_logo.png') }}"
+                alt="FROSTCORE logo"
+            >
+
+
+            <!-- TITLE -->
+
+            <h1>
+                WELCOME BACK
+            </h1>
+
+
+            <p class="login-subtitle">
+                Sign in to your FROSTCORE experience.
+            </p>
+
+            {% for message in app.flashes('success') %}
+                <p class="form-success" role="status">{{ message }}</p>
+            {% endfor %}
+
+            <!-- LOGIN FORM -->
+
+            <form
+                id="loginForm"
+                action="{{ path('app_login') }}"
+                method="post"
+            >
+
+                {% if error %}
+                    <p class="form-error" role="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</p>
+                {% endif %}
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <!-- EMAIL -->
+
+                <label for="email">
+                    EMAIL
+                </label>
+
+                <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value="{{ last_username }}"
+                    autocomplete="email"
+                    required
+                >
+
+
+                <!-- PASSWORD -->
+
+                <label for="password">
+                    PASSWORD
+                </label>
+
+
+                <div class="password-wrap">
+
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+
+                    <button
+                        type="button"
+                        id="showPassword"
+                    >
+                        SHOW
+                    </button>
+
+                </div>
+
+
+                <!-- SIGN IN -->
+
+                <button
+                    class="btn login-submit"
+                    type="submit"
+                >
+                    SIGN IN →
+                </button>
+
+            </form>
+
+
+            <!-- FORGOT PASSWORD -->
+
+            <!-- CREATE ACCOUNT -->
+
+            <p class="create">
+
+                Don't have an account?
+
+                <a href="{{ path('app_register') }}">
+                    CREATE ACCOUNT
+                </a>
+
+            </p>
+
+
+            <!-- BACK TO HOME -->
+
+            <p class="login-back-home">
+
+                <a href="{{ path('home') }}">
+                    ← Back to Home
+                </a>
+
+            </p>
+            {% if app.user %}
+                <p class="login-back-home">
+                    <a href="{{ path('app_about') }}">About us</a>
+                    &nbsp;·&nbsp;
+                    <a href="{{ path('app_contact') }}">Contact</a>
+                </p>
+            {% endif %}
+
+        </div>
+
+    </main>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script src="{{ asset('js/script.js') }}"></script>
+
+</body>
+
+</html>
