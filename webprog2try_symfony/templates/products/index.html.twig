@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Shop FROSTCORE Coolers</title>
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/products.css?v=6') }}">
+    <link rel="stylesheet" href="{{ asset('css/products.css?v=7') }}">
     <link rel="stylesheet" href="{{ asset('css/logout.css?v=1') }}">
 </head>
 <body>
@@ -64,12 +64,14 @@
                         <strong class="product-price">₱{{ product.price|number_format(2) }}</strong>
                         <div class="product-buttons">
                             <a class="view-button" href="{{ path('app_product_details', {id: product.id}) }}">DETAILS</a>
-                            {% if product.stock > 0 %}
+                            {% if app.user and product.stock > 0 %}
                                 <form action="{{ path('app_cart_add', {id: product.id}) }}" method="post">
                                     <input type="hidden" name="_token" value="{{ csrf_token('cart_add_' ~ product.id) }}">
                                     <input type="hidden" name="quantity" value="1">
                                     <button class="cart-button" type="submit">ADD TO CART</button>
                                 </form>
+                            {% elseif not app.user %}
+                                <a class="cart-button" href="{{ path('app_login') }}">SIGN IN TO SHOP</a>
                             {% else %}
                                 <button class="cart-button disabled" type="button" disabled>OUT OF STOCK</button>
                             {% endif %}

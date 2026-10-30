@@ -42,7 +42,7 @@ final class CartController extends AbstractController
     {
         $user = $this->currentUser();
         $product = $entityManager->getRepository(Product::class)->find($id);
-        if (!$product instanceof Product) {
+        if (!$product instanceof Product || !$product->isVisible()) {
             throw $this->createNotFoundException('Product not found.');
         }
         if (!$this->isCsrfTokenValid('cart_add_'.$id, (string) $request->request->get('_token'))) {

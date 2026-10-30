@@ -87,7 +87,7 @@ final class CheckoutController extends AbstractController
                     $subtotalCents = 0;
                     foreach ($items as $cartItem) {
                         $product = $manager->find(Product::class, $cartItem->getProduct()->getId(), LockMode::PESSIMISTIC_WRITE);
-                        if (!$product instanceof Product || $cartItem->getQuantity() > $product->getStock()) {
+                        if (!$product instanceof Product || !$product->isVisible() || $cartItem->getQuantity() > $product->getStock()) {
                             throw new DomainException(sprintf('%s no longer has enough stock.', $cartItem->getProduct()->getName()));
                         }
 

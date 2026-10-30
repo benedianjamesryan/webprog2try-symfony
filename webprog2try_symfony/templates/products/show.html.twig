@@ -23,18 +23,6 @@
             <p>★ {{ product.rating }} · {{ product.stock > 0 ? product.stock ~ ' available' : 'Out of stock' }}</p>
             <p>{{ product.description }}</p>
             <strong>₱{{ product.price|number_format(2) }}</strong>
-            {% if product.stock > 0 %}
-                {% if app.user %}
-                    <form action="{{ path('app_cart_add', {id: product.id}) }}" method="post">
-                        <input type="hidden" name="_token" value="{{ csrf_token('cart_add_' ~ product.id) }}">
-                        <label for="quantity">Quantity</label>
-                        <input id="quantity" name="quantity" type="number" min="1" max="{{ product.stock }}" value="1">
-                        <button class="btn" type="submit">ADD TO CART</button>
-                    </form>
-                {% else %}
-                    <p><a class="btn" href="{{ path('app_login') }}">SIGN IN TO SHOP</a></p>
-                {% endif %}
-            {% endif %}
         </div>
     </section>
     <section class="product-reviews">

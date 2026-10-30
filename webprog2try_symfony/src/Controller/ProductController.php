@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Product;
 use App\Entity\Review;
 use App\Entity\User;
+use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,10 +14,8 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class ProductController extends AbstractController
 {
-    private const CATEGORIES = ['Phone Cooler', 'Laptop Cooler', 'Bundle'];
-
     #[Route('/products', name: 'app_products', methods: ['GET'])]
-    public function index(Request $request, EntityManagerInterface $entityManager): Response
+    public function index(Request $request, ProductRepository $productRepository): Response
     {
         $query = mb_substr(trim((string) $request->query->get('q', '')), 0, 180);
         $category = (string) $request->query->get('category', '');
@@ -26,50 +25,20 @@ final class ProductController extends AbstractController
         $minRating = $this->boundedNumber($request->query->get('minRating'), 0, 5);
         $inStock = $request->query->getBoolean('inStock');
 
-        if (!in_array($category, self::CATEGORIES, true)) {
+        if (!in_array($category, ProductRepository::CATEGORIES, true)) {
             $category = '';
         }
         if ($minPrice !== null && $maxPrice !== null && $minPrice > $maxPrice) {
             [$minPrice, $maxPrice] = [$maxPrice, $minPrice];
         }
-
-        $queryBuilder = $entityManager->getRepository(Product::class)->createQueryBuilder('product');
-        if ($category !== '') {
-            $queryBuilder->andWhere('product.category = :category')->setParameter('category', $category);
-        }
-        if ($query !== '') {
-            $queryBuilder->andWhere('(product.name LIKE :query OR product.description LIKE :query)')
-                ->setParameter('query', '%'.$query.'%');
-        }
-        if ($minPrice !== null) {
-            $queryBuilder->andWhere('product.price >= :minPrice')->setParameter('minPrice', number_format($minPrice, 2, '.', ''));
-        }
-        if ($maxPrice !== null) {
-            $queryBuilder->andWhere('product.price <= :maxPrice')->setParameter('maxPrice', number_format($maxPrice, 2, '.', ''));
-        }
-        if ($minRating !== null) {
-            $queryBuilder->andWhere('product.rating >= :minRating')->setParameter('minRating', number_format($minRating, 1, '.', ''));
-        }
-        if ($inStock) {
-            $queryBuilder->andWhere('product.stock > 0');
-        }
-
-        $sortFields = [
-            'price_asc' => ['product.price', 'ASC'],
-            'price_desc' => ['product.price', 'DESC'],
-            'rating_desc' => ['product.rating', 'DESC'],
-            'name' => ['product.name', 'ASC'],
-            'featured' => ['product.id', 'ASC'],
-        ];
-        if (!isset($sortFields[$sort])) {
+        if (!in_array($sort, ['price_asc', 'price_desc', 'rating_desc', 'name', 'featured'], true)) {
             $sort = 'featured';
         }
-        [$sortField, $sortDirection] = $sortFields[$sort];
-        $products = $queryBuilder->orderBy($sortField, $sortDirection)->getQuery()->getResult();
+        $products = $productRepository->findForCatalog($query, $category, $minPrice, $maxPrice, $minRating, $inStock, $sort);
 
         return $this->render('products/index.html.twig', [
             'products' => $products,
-            'categories' => self::CATEGORIES,
+            'categories' => ProductRepository::CATEGORIES,
             'filters' => compact('query', 'category', 'sort', 'minPrice', 'maxPrice', 'minRating', 'inStock'),
         ]);
     }
@@ -78,7 +47,7 @@ final class ProductController extends AbstractController
     public function show(int $id, Request $request, EntityManagerInterface $entityManager): Response
     {
         $product = $entityManager->getRepository(Product::class)->find($id);
-        if (!$product instanceof Product) {
+        if (!$product instanceof Product || !$product->isVisible()) {
             throw $this->createNotFoundException('Product not found.');
         }
 

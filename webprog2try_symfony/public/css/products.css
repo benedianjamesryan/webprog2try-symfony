@@ -24,7 +24,7 @@ body {
     margin: 0;
     background: var(--bg);
     color: var(--text);
-    font-family: Orbitron, Arial, sans-serif;
+    font-family: "Orbitron", Arial, sans-serif;
     line-height: 1.5;
 }
 
@@ -52,6 +52,7 @@ select {
     align-items: center;
     justify-content: space-between;
     gap: 20px;
+    font-family: "Inter", Arial, sans-serif;
     background: rgba(5, 10, 22, 0.96);
     border-bottom: 1px solid var(--border);
     position: sticky;
@@ -79,12 +80,12 @@ select {
 .products-nav {
     display: flex;
     align-items: center;
-    gap: 45px;
+    gap: clamp(16px, 2.5vw, 32px);
 }
 
 .products-nav a {
     color: var(--text);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     transition: color 0.2s ease;
 }
@@ -203,7 +204,7 @@ select {
     background: transparent;
     color: var(--blue);
     border: 1px solid var(--blue);
-    font-family: Orbitron, Arial, sans-serif;
+    font-family: inherit;
     font-size: 8px;
     font-weight: 800;
     line-height: 1;

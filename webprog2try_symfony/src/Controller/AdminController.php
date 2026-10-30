@@ -7,6 +7,7 @@ use App\Entity\OrderItem;
 use App\Entity\Product;
 use App\Entity\Review;
 use App\Entity\User;
+use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +18,6 @@ use Symfony\Component\Routing\Attribute\Route;
 final class AdminController extends AbstractController
 {
     private const ORDER_STATUSES = ['Pending', 'Processing', 'Shipped', 'Completed', 'Cancelled'];
-    private const CATEGORIES = ['Phone Cooler', 'Laptop Cooler', 'Bundle'];
     private const PRODUCT_IMAGES = [
         'assets/products/fc1-cooler.svg',
         'assets/products/fc1-cooler.jpg',
@@ -59,23 +59,17 @@ final class AdminController extends AbstractController
     }
 
     #[Route('/products', name: 'products', methods: ['GET'])]
-    public function products(Request $request, EntityManagerInterface $entityManager): Response
+    public function products(Request $request, ProductRepository $productRepository): Response
     {
-        $search = trim((string) $request->query->get('q', ''));
+        $search = mb_substr(trim((string) $request->query->get('q', '')), 0, 180);
         $category = (string) $request->query->get('category', '');
-        $queryBuilder = $entityManager->getRepository(Product::class)->createQueryBuilder('product');
-        if ($search !== '') {
-            $queryBuilder->andWhere('product.name LIKE :search')->setParameter('search', '%'.$search.'%');
-        }
-        if (in_array($category, self::CATEGORIES, true)) {
-            $queryBuilder->andWhere('product.category = :category')->setParameter('category', $category);
-        } else {
+        if (!in_array($category, ProductRepository::CATEGORIES, true)) {
             $category = '';
         }
 
         return $this->render('admin/products.html.twig', [
-            'products' => $queryBuilder->orderBy('product.id', 'ASC')->getQuery()->getResult(),
-            'categories' => self::CATEGORIES,
+            'products' => $productRepository->findForAdmin($search, $category),
+            'categories' => ProductRepository::CATEGORIES,
             'search' => $search,
             'category' => $category,
         ]);
@@ -86,7 +80,7 @@ final class AdminController extends AbstractController
     {
         $product = new Product();
         $product->setName('');
-        $product->setCategory(self::CATEGORIES[0]);
+        $product->setCategory(ProductRepository::CATEGORIES[0]);
         $product->setDescription('');
         $product->setPrice('0.00');
         $product->setRating('0.0');
@@ -104,6 +98,24 @@ final class AdminController extends AbstractController
         }
 
         return $this->editProductForm($product, $request, $entityManager, false);
+    }
+
+    #[Route('/products/{id}/visibility', name: 'product_visibility', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function toggleProductVisibility(int $id, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $product = $entityManager->getRepository(Product::class)->find($id);
+        if (!$product instanceof Product) {
+            throw $this->createNotFoundException('Product not found.');
+        }
+        if (!$this->isCsrfTokenValid('admin_product_visibility_'.$id, (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Invalid product form token.');
+        }
+
+        $product->setVisible(!$product->isVisible());
+        $entityManager->flush();
+        $this->addFlash('success', $product->isVisible() ? 'Product shown in the catalog.' : 'Product hidden from the catalog.');
+
+        return $this->redirectToRoute('admin_products');
     }
 
     #[Route('/products/{id}/delete', name: 'product_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
@@ -288,7 +300,7 @@ final class AdminController extends AbstractController
 
         return $this->render('admin/product_form.html.twig', [
             'product' => $product,
-            'categories' => self::CATEGORIES,
+            'categories' => ProductRepository::CATEGORIES,
             'images' => self::PRODUCT_IMAGES,
             'isNew' => $isNew,
         ]);

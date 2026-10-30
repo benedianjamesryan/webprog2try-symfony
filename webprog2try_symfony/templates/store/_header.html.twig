@@ -9,8 +9,6 @@
         {% if app.user %}
             <a href="{{ path('app_about') }}" {{ app.request.attributes.get('_route') == 'app_about' ? 'aria-current="page"' : '' }}>About us</a>
             <a href="{{ path('app_contact') }}" {{ app.request.attributes.get('_route') == 'app_contact' ? 'aria-current="page"' : '' }}>Contact</a>
-        {% endif %}
-        {% if app.user %}
             <a href="{{ path('app_cart') }}" {{ app.request.attributes.get('_route') == 'app_cart' ? 'aria-current="page"' : '' }}>Cart{% if app.user.cartItems|length %} ({{ app.user.cartItems|length }}){% endif %}</a>
             <a href="{{ path('app_my_orders') }}" {{ app.request.attributes.get('_route') in ['app_my_orders', 'app_order_show'] ? 'aria-current="page"' : '' }}>My orders</a>
         {% endif %}

@@ -10,20 +10,19 @@
         <form class="search-form" method="get" action="{{ path('admin_products') }}"><input class="search-input" name="q" value="{{ search }}" placeholder="Search product name"><select name="category"><option value="">All categories</option>{% for option in categories %}<option value="{{ option }}" {{ category == option ? 'selected' : '' }}>{{ option }}</option>{% endfor %}</select><button class="search-button" type="submit">SEARCH</button></form>
         <a class="add-button" href="{{ path('admin_product_new') }}">+ ADD PRODUCT</a>
     </div>
+    {% for message in app.flashes('success') %}<p class="message success">{{ message }}</p>{% endfor %}
+    {% for message in app.flashes('error') %}<p class="message error">{{ message }}</p>{% endfor %}
     <div class="table-wrap"><table class="products-table">
-        <thead><tr><th>PRODUCT</th><th>CATEGORY</th><th>PRICE</th><th>RATING</th><th>STOCK</th><th>ACTIONS</th></tr></thead>
+        <thead><tr><th>PRODUCT</th><th>CATEGORY</th><th>PRICE</th><th>RATING</th><th>STOCK</th><th>VISIBILITY</th><th>ACTIONS</th></tr></thead>
         <tbody>{% for product in products %}
             <tr>
                 <td><div class="product-cell"><img class="product-thumb" src="{{ asset(product.image) }}" alt=""><strong class="product-name">{{ product.name }}</strong></div></td><td>{{ product.category }}</td><td>₱{{ product.price|number_format(2) }}</td><td>★ {{ product.rating }}</td><td>{{ product.stock }}</td>
+                <td>{{ product.visible ? 'Shown' : 'Hidden' }}</td>
                 <td class="product-actions"><a class="edit-link" href="{{ path('admin_product_edit', {id: product.id}) }}">EDIT</a>
-                    {% if product.stock > 0 %}
-                        <form class="cart-add-form" action="{{ path('app_cart_add', {id: product.id}) }}" method="post"><input type="hidden" name="_token" value="{{ csrf_token('cart_add_' ~ product.id) }}"><input type="hidden" name="quantity" value="1"><button class="cart-add-button" type="submit">ADD TO CART</button></form>
-                    {% else %}
-                        <button class="cart-add-button disabled" type="button" disabled>OUT OF STOCK</button>
-                    {% endif %}
+                    <form class="visibility-form" method="post" action="{{ path('admin_product_visibility', {id: product.id}) }}"><input type="hidden" name="_token" value="{{ csrf_token('admin_product_visibility_' ~ product.id) }}"><button class="edit-link" type="submit">{{ product.visible ? 'HIDE' : 'SHOW' }}</button></form>
                     <form class="delete-form" method="post" action="{{ path('admin_product_delete', {id: product.id}) }}" onsubmit="return confirm('Delete this product?')"><input type="hidden" name="_token" value="{{ csrf_token('admin_product_delete_' ~ product.id) }}"><button class="delete-button" type="submit">DELETE</button></form>
                 </td>
             </tr>
-        {% else %}<tr><td colspan="6" class="empty-state">No products found.</td></tr>{% endfor %}</tbody>
+        {% else %}<tr><td colspan="7" class="empty-state">No products found.</td></tr>{% endfor %}</tbody>
     </table></div>
 {% endblock %}
