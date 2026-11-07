@@ -145,7 +145,7 @@
 .checkout-note {
     margin: 0;
     color: var(--muted);
-    font-family: Arial, sans-serif;
+    font-family: "Orbitron", sans-serif;
     font-size: 12px;
     line-height: 1.6;
 }
@@ -154,7 +154,7 @@
     display: block;
     margin-top: 8px;
     color: var(--muted);
-    font-family: Arial, sans-serif;
+    font-family: "Orbitron", sans-serif;
     font-size: 11px;
     line-height: 1.5;
 }
@@ -170,7 +170,7 @@
 }
 
 .payment-details .checkout-field input {
-    font-family: Arial, sans-serif;
+    font-family: "Orbitron", sans-serif;
     font-size: 14px;
     letter-spacing: 0.02em;
 }
@@ -181,7 +181,7 @@
 .checkout-item-info p,
 .summary-row,
 .back-cart {
-    font-family: Arial, sans-serif;
+    font-family: "Orbitron", sans-serif;
 }
 
 .checkout-item {

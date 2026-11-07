@@ -7,6 +7,7 @@ use App\Entity\Product;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -51,6 +52,10 @@ final class CartController extends AbstractController
 
         $quantity = filter_var($request->request->get('quantity', 1), FILTER_VALIDATE_INT);
         if ($quantity === false || $quantity < 1) {
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse(['message' => 'Enter a quantity of at least one.'], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
             $this->addFlash('error', 'Enter a quantity of at least one.');
 
             return $this->redirectToRoute('app_product_details', ['id' => $id]);
@@ -59,6 +64,10 @@ final class CartController extends AbstractController
         $item = $entityManager->getRepository(CartItem::class)->findOneBy(['user' => $user, 'product' => $product]);
         $newQuantity = $quantity + ($item instanceof CartItem ? $item->getQuantity() : 0);
         if ($newQuantity > $product->getStock()) {
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse(['message' => 'The requested quantity is not available in stock.'], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
             $this->addFlash('error', 'The requested quantity is not available in stock.');
 
             return $this->redirectToRoute('app_product_details', ['id' => $id]);
@@ -72,6 +81,14 @@ final class CartController extends AbstractController
         }
         $item->setQuantity($newQuantity);
         $entityManager->flush();
+
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse([
+                'message' => 'Added to your cart.',
+                'productName' => $product->getName(),
+            ]);
+        }
+
         $this->addFlash('success', 'Added to your cart.');
 
         return $this->redirectToRoute('app_cart');

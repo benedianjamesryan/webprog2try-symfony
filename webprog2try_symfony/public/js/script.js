@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const password = document.getElementById("password");
     const showPassword = document.getElementById("showPassword");
     const loginTriggers = document.querySelectorAll(".requires-login");
+    let lastFocusedElement = null;
 
 
     function openLogin(event) {
@@ -21,14 +22,17 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         event.preventDefault();
+        lastFocusedElement = event.currentTarget;
 
         loginOverlay.classList.add("show");
         loginOverlay.setAttribute("aria-hidden", "false");
         document.body.classList.add("modal-open");
 
-        setTimeout(function () {
-            document.getElementById("email")?.focus();
-        }, 50);
+        window.requestAnimationFrame(function () {
+            if (loginOverlay.classList.contains("show")) {
+                document.getElementById("email")?.focus();
+            }
+        });
     }
 
 
@@ -41,6 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
         loginOverlay.classList.remove("show");
         loginOverlay.setAttribute("aria-hidden", "true");
         document.body.classList.remove("modal-open");
+        lastFocusedElement?.focus();
     }
 
 
@@ -68,11 +73,32 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
-
     document.addEventListener("keydown", function (event) {
 
+        if (!loginOverlay || !loginOverlay.classList.contains("show")) {
+            return;
+        }
+
         if (event.key === "Escape") {
+            event.preventDefault();
             closeLoginModal();
+            return;
+        }
+
+        if (event.key === "Tab") {
+            const focusableElements = loginOverlay.querySelectorAll(
+                'a[href], button:not([disabled]), input:not([disabled])'
+            );
+            const firstElement = focusableElements[0];
+            const lastElement = focusableElements[focusableElements.length - 1];
+
+            if (event.shiftKey && document.activeElement === firstElement) {
+                event.preventDefault();
+                lastElement.focus();
+            } else if (!event.shiftKey && document.activeElement === lastElement) {
+                event.preventDefault();
+                firstElement.focus();
+            }
         }
 
     });
@@ -300,6 +326,50 @@ document.addEventListener("DOMContentLoaded", function () {
             "false"
         );
 
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const revealElements = document.querySelectorAll(
+            ".problem .container > h2, .problem .section-intro, " +
+            ".product .container > .eyebrow, .product .container > h2, " +
+            ".reviews .container > .eyebrow, .reviews .container > h2, " +
+            ".problem-grid article, .product-image-card, .feature, " +
+            ".specs-grid > div, .review-grid .review, .footer-grid > div"
+        );
+
+        if (reducedMotion || !("IntersectionObserver" in window) || revealElements.length === 0) {
+            return;
+        }
+
+        document.documentElement.classList.add("scroll-reveal-enabled");
+
+        document.querySelectorAll(".problem-grid, .features, .specs-grid, .review-grid, .footer-grid")
+            .forEach(function (group) {
+                Array.from(group.children).forEach(function (element, index) {
+                    element.style.setProperty(
+                        "--scroll-reveal-delay",
+                        Math.min(index, 3) * 80 + "ms"
+                    );
+                });
+            });
+
+        const observer = new IntersectionObserver(function (entries, currentObserver) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("is-visible");
+                    currentObserver.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: "0px 0px -40px 0px"
+        });
+
+        revealElements.forEach(function (element) {
+            element.classList.add("scroll-reveal");
+            observer.observe(element);
+        });
     });
 
 

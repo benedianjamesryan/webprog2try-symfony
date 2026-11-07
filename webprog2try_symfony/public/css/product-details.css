@@ -600,6 +600,116 @@ body {
     font-size: 9px;
 }
 
+.product-details-page .product-back {
+    margin-bottom: 28px;
+}
+
+.product-details-info .product-category {
+    margin: 0 0 15px;
+    color: #4DBCF4;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.product-details-info .product-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 18px;
+    color: #F4F7FF;
+    font-size: 12px;
+}
+
+.product-details-info .product-rating .stars {
+    color: #FFD166;
+    font-size: 16px;
+}
+
+.product-details-info .product-rating span:last-child {
+    color: #AAB5CA;
+}
+
+.product-details-info .product-stock {
+    margin: 0 0 16px;
+}
+
+.product-details-info .product-description {
+    padding: 18px 0;
+    margin: 0 0 18px;
+    border-top: 1px solid #263452;
+    border-bottom: 1px solid #263452;
+}
+
+.product-details-info .product-description h3 {
+    margin: 0 0 8px;
+    color: #AAB5CA;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+}
+
+.product-details-info .product-description p {
+    margin: 0;
+    color: #AAB5CA;
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+.product-details-info .product-details-price {
+    margin: 0 0 18px;
+    color: #4DBCF4;
+    font-size: 30px;
+}
+
+.product-details-info .add-to-cart-form {
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.product-details-info .add-cart-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #4DBCF4;
+    border-radius: 0;
+    font-family: inherit;
+    text-decoration: none;
+}
+
+.product-details-info .add-cart-button:hover:not(.disabled) {
+    background: #6CC9F7;
+    border-color: #6CC9F7;
+}
+
+.product-details-page .review-form select {
+    display: block;
+    min-width: 180px;
+    height: 38px;
+    padding: 0 10px;
+    margin: 0 0 18px;
+    color: #F4F7FF;
+    background: #081225;
+    border: 1px solid #263452;
+    font-family: inherit;
+    font-size: 9px;
+}
+
+.product-details-page .review-form select:focus {
+    border-color: #4DBCF4;
+    outline: none;
+}
+
+.product-details-page .review-submit {
+    font-family: inherit;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.product-details-page .review-submit:hover {
+    background: #6CC9F7;
+    border-color: #6CC9F7;
+}
+
 .site-footer {
     width: 100%;
     box-sizing: border-box;

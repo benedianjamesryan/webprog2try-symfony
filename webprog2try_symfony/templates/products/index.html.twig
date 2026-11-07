@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Shop FROSTCORE Coolers</title>
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/products.css?v=7') }}">
-    <link rel="stylesheet" href="{{ asset('css/logout.css?v=1') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css?v=5') }}">
+    <link rel="stylesheet" href="{{ asset('css/products.css?v=9') }}">
+    <link rel="stylesheet" href="{{ asset('css/logout.css?v=2') }}">
 </head>
 <body>
 {% include 'store/_header.html.twig' %}
@@ -65,7 +65,7 @@
                         <div class="product-buttons">
                             <a class="view-button" href="{{ path('app_product_details', {id: product.id}) }}">DETAILS</a>
                             {% if app.user and product.stock > 0 %}
-                                <form action="{{ path('app_cart_add', {id: product.id}) }}" method="post">
+                                <form action="{{ path('app_cart_add', {id: product.id}) }}" method="post" data-cart-add>
                                     <input type="hidden" name="_token" value="{{ csrf_token('cart_add_' ~ product.id) }}">
                                     <input type="hidden" name="quantity" value="1">
                                     <button class="cart-button" type="submit">ADD TO CART</button>
@@ -84,6 +84,18 @@
         </div>
     </section>
 </main>
-<script src="{{ asset('js/products.js?v=1') }}" defer></script>
+<div class="cart-popup-overlay" id="cart-popup-overlay" aria-hidden="true">
+    <section class="cart-popup" role="dialog" aria-modal="true" aria-labelledby="cart-popup-title" aria-describedby="cart-popup-message">
+        <button class="cart-popup-close" id="cart-popup-close" type="button" aria-label="Close cart message">&times;</button>
+        <div class="cart-popup-icon" id="cart-popup-icon" aria-hidden="true">✓</div>
+        <h2 id="cart-popup-title">ADDED TO YOUR CART</h2>
+        <p id="cart-popup-message" role="status"></p>
+        <div class="cart-popup-actions">
+            <button class="cart-continue" id="cart-continue" type="button">CONTINUE SHOPPING</button>
+            <a class="cart-view" id="cart-checkout" href="{{ path('app_checkout') }}">PROCEED TO CHECKOUT</a>
+        </div>
+    </section>
+</div>
+<script src="{{ asset('js/products.js?v=2') }}" defer></script>
 </body>
 </html>

@@ -7,9 +7,9 @@
 
     <title>FROSTCORE — Stay Cool. Play Better.</title>
 
-    <link rel="stylesheet" href="{{ asset('css/style.css?v=3') }}">
-    <link rel="stylesheet" href="{{ asset('css/home.css?v=3') }}">
-    <link rel="stylesheet" href="{{ asset('css/logout.css?v=1') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css?v=5') }}">
+    <link rel="stylesheet" href="{{ asset('css/home.css?v=8') }}">
+    <link rel="stylesheet" href="{{ asset('css/logout.css?v=2') }}">
 </head>
 
 <body>
@@ -30,24 +30,23 @@
         <a href="#product">Product</a>
         <a href="#specs">Specs</a>
         <a href="#reviews">Reviews</a>
-        {% if app.user %}
-            <a href="{{ path('app_about') }}">About us</a>
-            <a href="{{ path('app_contact') }}">Contact</a>
-        {% endif %}
     </nav>
 
     <div class="home-header-actions">
 
         {% if is_granted('ROLE_ADMIN') %}
-            <a href="{{ path('admin_dashboard') }}" class="admin-link">ADMIN</a>
+            <a href="{{ path('admin_dashboard') }}" class="admin-dashboard-link">ADMIN DASHBOARD</a>
         {% endif %}
         {% if app.user %}
+            <a href="{{ path('app_cart') }}" class="home-account-link">CART{% if app.user.cartItems|length %} ({{ app.user.cartItems|length }}){% endif %}</a>
+            <a href="{{ path('app_my_orders') }}" class="home-account-link">MY ORDERS</a>
             <a href="{{ path('app_products') }}" class="btn btn-small">SHOP NOW</a>
             <form action="{{ path('app_logout') }}" method="post" data-logout-confirm>
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
-                <button class="logout-button" type="submit">LOGOUT</button>
+                <button class="logout-button" type="submit">LOG OUT</button>
             </form>
         {% else %}
+            <a href="{{ path('app_login') }}" class="login-link requires-login">LOGIN</a>
             <a href="{{ path('app_products') }}" class="btn btn-small">SHOP NOW</a>
         {% endif %}
 
@@ -56,6 +55,47 @@
 </header>
 {% include 'store/_logout_confirmation.html.twig' %}
 
+{% if not app.user %}
+    <div class="login-overlay" id="loginOverlay" aria-hidden="true">
+        <section class="login-modal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+            <button class="close-login" id="closeLogin" type="button" aria-label="Close login">&times;</button>
+            <img class="login-logo" src="{{ asset('assets/logo/frostcore_logo.png') }}" alt="FROSTCORE logo">
+            <h2 id="loginTitle">WELCOME BACK</h2>
+            <p class="login-subtitle">Sign in to your FROSTCORE experience.</p>
+
+            <form id="loginForm" action="{{ path('app_login') }}" method="post">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <label for="email">EMAIL</label>
+                <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    autocomplete="email"
+                    required
+                >
+
+                <label for="password">PASSWORD</label>
+                <div class="password-wrap">
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+                    <button type="button" id="showPassword">SHOW</button>
+                </div>
+
+                <button class="btn login-submit" type="submit">SIGN IN &rarr;</button>
+            </form>
+
+            <p class="create">Don't have an account? <a href="{{ path('app_register') }}">CREATE ACCOUNT</a></p>
+        </section>
+    </div>
+{% endif %}
 
 <main>
 
@@ -535,7 +575,7 @@
 </footer>
 
 
-<script src="{{ asset('js/script.js') }}"></script>
+<script src="{{ asset('js/script.js?v=3') }}"></script>
 
 </body>
 

@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Checkout — FROSTCORE</title>
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/products.css?v=5') }}">
-    <link rel="stylesheet" href="{{ asset('css/logout.css?v=1') }}">
-    <link rel="stylesheet" href="{{ asset('css/checkout.css?v=3') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css?v=5') }}">
+    <link rel="stylesheet" href="{{ asset('css/products.css?v=7') }}">
+    <link rel="stylesheet" href="{{ asset('css/logout.css?v=2') }}">
+    <link rel="stylesheet" href="{{ asset('css/checkout.css?v=4') }}">
 </head>
 <body>
 {% include 'store/_header.html.twig' %}
@@ -97,7 +97,7 @@
                             </div>
                             <div class="checkout-field">
                                 <label for="card_expiry">Expiry date</label>
-                                <input id="card_expiry" type="month" autocomplete="off">
+                                <input id="card_expiry" type="text" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" maxlength="5" pattern="(0[1-9]|1[0-2])/[0-9]{2}" aria-describedby="card-help">
                             </div>
                             <div class="checkout-field">
                                 <label for="card_cvv">Security code (CVV)</label>

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&display=swap');
 
 :root {
     --bg: #050a16;
@@ -25,7 +25,7 @@ body {
     margin: 0;
     background: var(--bg);
     color: var(--text);
-    font-family: "Orbitron", Arial, sans-serif;
+    font-family: "Orbitron", sans-serif;
     line-height: 1.6;
 }
 
@@ -83,7 +83,7 @@ p {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-family: "Inter", Arial, sans-serif;
+    font-family: "Orbitron", sans-serif;
     position: sticky;
     top: 0;
     z-index: 9999;
@@ -161,19 +161,18 @@ p {
     border-color: var(--blue);
 }
 
-.admin-link {
+.admin-dashboard-link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 61px;
-    height: 35px;
-    padding: 0;
+    min-height: 35px;
+    padding: 0 14px;
     margin: 0;
     background: transparent;
     color: var(--blue);
     border: 1px solid var(--blue);
     font-family: inherit;
-    font-size: 8px;
+    font-size: 9px;
     font-weight: 800;
     line-height: 1;
     text-align: center;
@@ -183,7 +182,7 @@ p {
     transition: 0.2s ease;
 }
 
-.admin-link:hover {
+.admin-dashboard-link:hover {
     background: rgba(77, 188, 244, 0.08);
 }
 
@@ -533,10 +532,10 @@ textarea::placeholder {
         font-size: 8px;
     }
 
-    .admin-link {
-        width: 56px;
-        height: 32px;
-        font-size: 7px;
+    .admin-dashboard-link {
+        min-height: 32px;
+        padding: 0 10px;
+        font-size: 8px;
     }
 
     .login-page-main,

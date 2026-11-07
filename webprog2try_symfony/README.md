@@ -69,17 +69,8 @@ never expose the promotion command to an untrusted user.
   GCash, or Card as the recorded payment method, and view their own order
   history.
 - Administrators can manage products, update order statuses, review customers,
-  manage brands at `/admin/brands`, and moderate product reviews under `/admin`.
+  and moderate product reviews under `/admin`.
 - The contact form opens an email draft in the visitor's configured email
   application; it does not send or store messages.
-
-The Brand entity uses the PHP property `brandName`; Doctrine maps it to the
-`brand_name` database column. After starting the database, generate and apply
-its schema migration with:
-
-```powershell
-php bin/console make:migration
-php bin/console doctrine:migrations:migrate
-```
 
 To stop the database while preserving its data, run `docker compose down`.

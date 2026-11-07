@@ -32,10 +32,13 @@ cardNumber.addEventListener('input', () => {
     cardNumber.value = digits.replace(/(\d{4})(?=\d)/g, '$1 ');
 });
 
+cardExpiry.addEventListener('input', () => {
+    const digits = cardExpiry.value.replace(/\D/g, '').slice(0, 4);
+    cardExpiry.value = digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
+});
+
 cardCvv.addEventListener('input', () => {
     cardCvv.value = cardCvv.value.replace(/\D/g, '').slice(0, 4);
 });
 
-const currentDate = new Date();
-cardExpiry.min = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
 updatePaymentDetails();

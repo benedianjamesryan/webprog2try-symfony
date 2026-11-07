@@ -52,15 +52,26 @@ a {
 }
 
 .admin-logout {
-    padding: 9px 14px;
+    display: inline-flex;
+    min-height: 35px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 14px;
+    background: transparent;
     color: #4DBCF4;
     border: 1px solid #4DBCF4;
+    font-family: inherit;
     font-size: 9px;
     font-weight: 800;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
 }
 
 .admin-logout:hover {
-    background: rgba(77, 188, 244, 0.08);
+    background: rgba(77, 188, 244, 0.1);
+    color: #F4F7FF;
 }
 
 .admin-layout {
@@ -193,6 +204,21 @@ a {
 
 .search-input:focus {
     border-color: #4DBCF4;
+}
+
+.search-form select {
+    height: 38px;
+    padding: 0 8px;
+    color: #F4F7FF;
+    background: #081225;
+    border: 1px solid #263452;
+    font-family: inherit;
+    font-size: 9px;
+}
+
+.search-form select:focus {
+    border-color: #4DBCF4;
+    outline: none;
 }
 
 .search-button {
@@ -351,10 +377,6 @@ a {
     border-collapse: collapse;
 }
 
-.products-table.brands-table {
-    min-width: 560px;
-}
-
 .products-table th {
     padding: 14px 12px;
     text-align: left;
@@ -440,9 +462,12 @@ a {
     padding: 7px 10px;
     margin-right: 5px;
     color: #4DBCF4;
+    background: transparent;
     border: 1px solid #4DBCF4;
+    font-family: inherit;
     font-size: 8px;
     font-weight: 800;
+    cursor: pointer;
 }
 
 .delete-form {

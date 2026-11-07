@@ -85,34 +85,6 @@
     text-decoration: none;
 }
 
-.orders-actions .admin-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 61px;
-    height: 35px;
-    padding: 0;
-    margin: 0;
-    background: transparent;
-    color: #4DBCF4;
-    border: 1px solid #4DBCF4;
-    font-family: Orbitron, Arial, sans-serif;
-    font-size: 8px;
-    font-weight: 800;
-    line-height: 1;
-    text-align: center;
-    white-space: nowrap;
-    flex-shrink: 0;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.orders-actions .admin-link:hover {
-    background: rgba(77, 188, 244, 0.08);
-    color: #4DBCF4;
-    border-color: #4DBCF4;
-}
-
 .orders-actions .login-link,
 .orders-actions .logout-button {
     color: #AAB5CA;
@@ -563,12 +535,6 @@
 
     .orders-actions {
         gap: 12px;
-    }
-
-    .orders-actions .admin-link {
-        width: 61px;
-        height: 32px;
-        font-size: 7px;
     }
 
     .orders-page {

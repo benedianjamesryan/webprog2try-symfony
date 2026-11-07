@@ -120,34 +120,7 @@ a {
     color: var(--blue);   
 }
 
-.header-actions .admin-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 61px;
-    height: 35px;
-    padding: 0;
-    margin: 0;
-    background: transparent;
-    color: var(--blue) !important;
-    border: 1px solid var(--blue);
-    font-family: Orbitron, Arial, sans-serif;
-    font-size: 8px !important;
-    font-weight: 800 !important;
-    line-height: 1;
-    text-align: center;
-    text-decoration: none;
-    white-space: nowrap;
-    flex-shrink: 0;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
 
-.header-actions .admin-link:hover {
-    background: rgba(77, 188, 244, 0.08);
-    color: var(--blue) !important;
-    border-color: var(--blue);
-}
 
 .cart-link {
     position: relative;
@@ -524,12 +497,6 @@ a {
 
     .header-actions {
         gap: 12px;
-    }
-
-    .header-actions .admin-link {
-        width: 61px;
-        height: 32px;
-        font-size: 7px !important;
     }
 
     .contact-page {
